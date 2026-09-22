@@ -3,7 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { TableModule } from '@openng/optimus-ui/table';
 import { PrimeTemplate } from '@openng/optimus-ui/api';
 import { Button } from '@openng/optimus-ui/button';
-import { Candidate } from '../candidate.model';
+import { Candidate } from '@features/candidates/candidate.model';
 
 @Component({
   selector: 'app-candidates-list',

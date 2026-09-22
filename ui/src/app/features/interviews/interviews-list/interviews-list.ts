@@ -3,7 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { TableModule } from '@openng/optimus-ui/table';
 import { PrimeTemplate } from '@openng/optimus-ui/api';
 import { Button } from '@openng/optimus-ui/button';
-import { Interview } from '../../../shared/models/interview.model';
+import { Interview } from '@shared/models/interview.model';
 
 @Component({
   selector: 'app-interviews-list',

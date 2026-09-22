@@ -1,8 +1,10 @@
 @if (layout.mobileMenuOpen()) {
-  <div
-    class="fixed inset-0 z-30 bg-black/50 md:hidden"
+  <button
+    type="button"
+    class="fixed inset-0 z-30 cursor-default bg-black/50 md:hidden"
     (click)="layout.closeMobileMenu()"
-  ></div>
+    aria-label="Close menu"
+  ></button>
 }
 
 <aside

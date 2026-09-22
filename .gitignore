@@ -17,3 +17,6 @@ api/src/generated/
 
 # logs
 *.log
+
+# local CI simulation (gitlab-ci-local)
+.gitlab-ci-local/

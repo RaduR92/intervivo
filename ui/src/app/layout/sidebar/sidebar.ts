@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Button } from '@openng/optimus-ui/button';
-import { LayoutService } from '../../core/services/layout.service';
+import { LayoutService } from '@core/services/layout.service';
 
 interface NavItem {
   label: string;

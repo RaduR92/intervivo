@@ -5,7 +5,7 @@ import { Button } from '@openng/optimus-ui/button';
 import { InputText } from '@openng/optimus-ui/inputtext';
 import { TableModule } from '@openng/optimus-ui/table';
 import { PrimeTemplate } from '@openng/optimus-ui/api';
-import { Interview } from '../../../shared/models/interview.model';
+import { Interview } from '@shared/models/interview.model';
 
 @Component({
   selector: 'app-candidate-detail',

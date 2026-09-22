@@ -1,0 +1,41 @@
+stages:
+  - test
+  - build
+
+default:
+  image: node:22-alpine
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "ui/**/*"
+
+.ui-job:
+  cache:
+    key:
+      files:
+        - ui/package-lock.json
+    paths:
+      - ui/node_modules
+  before_script:
+    - cd ui
+    - npm ci --legacy-peer-deps
+
+ui:lint:
+  extends: .ui-job
+  stage: test
+  script:
+    - npm run lint
+
+ui:test:
+  extends: .ui-job
+  stage: test
+  script:
+    - npm run test
+
+ui:build:
+  extends: .ui-job
+  stage: build
+  script:
+    - npm run build
