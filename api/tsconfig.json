@@ -17,6 +17,14 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "types": ["vitest/globals", "node"]
+    "types": ["vitest/globals", "node"],
+    "paths": {
+      "@common/*": ["./src/common/*"],
+      "@auth/*": ["./src/auth/*"],
+      "@db/*": ["./src/prisma/*"],
+      "@redis/*": ["./src/redis/*"],
+      "@health/*": ["./src/health/*"],
+      "@generated/*": ["./src/generated/*"]
+    }
   }
 }
