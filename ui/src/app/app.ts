@@ -1,13 +1,13 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { Button } from '@openng/optimus-ui/button';
+import { Component } from '@angular/core';
+import { Header } from './layout/header/header';
+import { Sidebar } from './layout/sidebar/sidebar';
+import { Main } from './layout/main/main';
+import { Footer } from './layout/footer/footer';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Button],
+  imports: [Header, Sidebar, Main, Footer],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
-export class App {
-  protected readonly title = signal('ui');
-}
+export class App {}
