@@ -3,23 +3,23 @@ import { Router, RouterOutlet } from '@angular/router';
 import { TableModule } from '@openng/optimus-ui/table';
 import { PrimeTemplate } from '@openng/optimus-ui/api';
 import { Button } from '@openng/optimus-ui/button';
-import { Interview } from '../../../shared/models/interview.model';
+import { Candidate } from '../candidate.model';
 
 @Component({
-  selector: 'app-interviews-list',
+  selector: 'app-candidates-list',
   imports: [RouterOutlet, TableModule, PrimeTemplate, Button],
-  templateUrl: './interviews-list.html',
+  templateUrl: './candidates-list.html',
 })
-export class InterviewsList {
+export class CandidatesList {
   private readonly router = inject(Router);
 
-  protected readonly interviews = signal<Interview[]>([]);
+  protected readonly candidates = signal<Candidate[]>([]);
 
   protected openDetail(id: string): void {
-    this.router.navigate(['/interviews', id]);
+    this.router.navigate(['/candidates', id]);
   }
 
   protected openAddDialog(): void {
-    this.router.navigate(['/interviews', 'new']);
+    this.router.navigate(['/candidates', 'new']);
   }
 }

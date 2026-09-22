@@ -1,9 +1,17 @@
+@if (layout.mobileMenuOpen()) {
+  <div
+    class="fixed inset-0 z-30 bg-black/50 md:hidden"
+    (click)="layout.closeMobileMenu()"
+  ></div>
+}
+
 <aside
-  class="flex flex-col border-r border-surface bg-[var(--p-content-background)] transition-[width] duration-200"
-  [class.w-64]="!layout.sidebarCollapsed()"
-  [class.w-16]="layout.sidebarCollapsed()"
+  class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-surface bg-[var(--p-content-background)] transition-[width,transform] duration-200 md:static md:z-auto md:translate-x-0"
+  [class.-translate-x-full]="!layout.mobileMenuOpen()"
+  [class.md:w-64]="!layout.sidebarCollapsed()"
+  [class.md:w-16]="layout.sidebarCollapsed()"
 >
-  <div class="flex justify-end p-2">
+  <div class="hidden justify-end p-2 md:flex">
     <p-button
       [icon]="layout.sidebarCollapsed() ? 'pi pi-angle-right' : 'pi pi-angle-left'"
       severity="secondary"
@@ -15,19 +23,32 @@
     />
   </div>
 
+  <div class="flex justify-end p-2 md:hidden">
+    <p-button
+      icon="pi pi-times"
+      severity="secondary"
+      text
+      rounded
+      size="small"
+      (onClick)="layout.closeMobileMenu()"
+      ariaLabel="Close menu"
+    />
+  </div>
+
   <nav class="flex flex-col gap-1 px-2">
     @for (item of navItems; track item.route) {
       <a
         [routerLink]="item.route"
         routerLinkActive="bg-highlight text-color-emphasis"
         class="flex items-center gap-3 rounded-border px-3 py-2 text-sm text-color hover:bg-emphasis"
-        [class.justify-center]="layout.sidebarCollapsed()"
+        [class.md:justify-center]="layout.sidebarCollapsed()"
         [title]="layout.sidebarCollapsed() ? item.label : ''"
+        (click)="layout.closeMobileMenu()"
       >
         <i [class]="item.icon + ' text-base'"></i>
-        @if (!layout.sidebarCollapsed()) {
-          <span>{{ item.label }}</span>
-        }
+        <span [class.md:hidden]="layout.sidebarCollapsed()">{{
+          item.label
+        }}</span>
       </a>
     }
   </nav>
