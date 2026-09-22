@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build output
+ui/dist/
+api/dist/
+ui/.angular/
+api/src/generated/
+
+# env
+.env
+.env.*.local
+
+# OS / IDE
+.DS_Store
+.idea/
+
+# logs
+*.log
