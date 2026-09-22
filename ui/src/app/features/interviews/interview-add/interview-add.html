@@ -1,0 +1,15 @@
+<p-dialog
+  header="Add Interview"
+  [visible]="true"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '32rem' }"
+  (onHide)="close()"
+>
+  <p class="text-muted-color">Interview form goes here.</p>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" severity="secondary" text (onClick)="close()" />
+    <p-button label="Save" (onClick)="close()" />
+  </ng-template>
+</p-dialog>

@@ -5,11 +5,29 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () =>
-      import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
+      import('./features/dashboard/dashboard').then((m) => m.Dashboard),
   },
   {
     path: 'interviews',
     loadComponent: () =>
-      import('./pages/interviews/interviews').then((m) => m.Interviews),
+      import('./features/interviews/interviews-list/interviews-list').then(
+        (m) => m.InterviewsList,
+      ),
+    children: [
+      {
+        path: 'new',
+        loadComponent: () =>
+          import('./features/interviews/interview-add/interview-add').then(
+            (m) => m.InterviewAdd,
+          ),
+      },
+    ],
+  },
+  {
+    path: 'interviews/:id',
+    loadComponent: () =>
+      import(
+        './features/interviews/interview-detail/interview-detail'
+      ).then((m) => m.InterviewDetail),
   },
 ];
