@@ -14,6 +14,8 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideOptimus({ theme: { preset: Aura } }),
+    provideOptimus({
+      theme: { preset: Aura, options: { darkModeSelector: 'none' } },
+    }),
   ],
 };
