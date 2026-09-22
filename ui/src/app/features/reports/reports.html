@@ -1,0 +1,134 @@
+<div class="flex flex-col gap-4">
+  <h1 class="text-2xl font-semibold text-color">Reports</h1>
+
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    @for (stat of stats; track stat.label) {
+      <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+        <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+          {{ stat.label }}
+        </p>
+        <p class="mt-2 text-2xl font-semibold" [class]="stat.colorClass">
+          {{ stat.value }}
+        </p>
+      </div>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div
+      class="rounded-border border border-surface bg-[var(--p-content-background)] p-4 lg:col-span-2"
+    >
+      <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+        Session Volume by Type
+      </p>
+      <p-chart
+        type="bar"
+        class="relative mt-4 block h-72"
+        [data]="sessionVolumeData"
+        [options]="sessionVolumeOptions"
+      />
+    </div>
+
+    <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+      <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+        Outcome Distribution
+      </p>
+      <div class="mt-4 flex flex-col items-center gap-4">
+        <p-chart
+          type="doughnut"
+          width="176"
+          height="176"
+          class="relative block h-44 w-44 overflow-hidden"
+          [data]="outcomeData"
+          [options]="outcomeOptions"
+        />
+        <ul class="flex w-full flex-col gap-2 text-sm">
+          @for (item of outcomes; track item.label) {
+            <li class="flex items-center justify-between gap-6">
+              <span class="flex items-center gap-2 text-color">
+                <span class="h-2 w-2 rounded-full" [class]="item.dotClass"></span>
+                {{ item.label }}
+              </span>
+              <span class="font-medium" [class]="item.textClass">{{
+                item.value
+              }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+      <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+        Monthly Session Volume
+      </p>
+      <p-chart
+        type="line"
+        class="relative mt-4 block h-64"
+        [data]="monthlyVolumeData"
+        [options]="monthlyVolumeOptions"
+      />
+    </div>
+
+    <div
+      class="rounded-border border border-surface bg-[var(--p-content-background)] p-4 lg:col-span-2"
+    >
+      <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+        Candidate Scores
+      </p>
+      <ul class="mt-4 flex flex-col gap-3">
+        @for (candidate of candidateScores; track candidate.rank) {
+          <li class="flex items-center gap-3 text-sm">
+            <span class="w-4 shrink-0 text-muted-color">{{
+              candidate.rank
+            }}</span>
+            <span class="w-16 shrink-0 truncate text-color">{{
+              candidate.name
+            }}</span>
+            <span
+              class="h-2 flex-1 overflow-hidden rounded-full bg-[var(--p-content-border-color)]"
+            >
+              <span
+                class="block h-full rounded-full"
+                [class]="scoreColorClass(candidate.score)"
+                [style.width.%]="(candidate.score / 10) * 100"
+              ></span>
+            </span>
+            <span
+              class="w-8 shrink-0 text-right font-medium"
+              [class]="scoreTextClass(candidate.score)"
+              >{{ candidate.score }}</span
+            >
+            <span class="w-6 shrink-0 text-right text-xs text-muted-color"
+              >{{ candidate.sessions }}s</span
+            >
+          </li>
+        }
+      </ul>
+
+      <div class="mt-6 border-t border-surface pt-4">
+        <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+          Feedback Status
+        </p>
+        <div class="mt-2 flex items-center gap-3 text-sm">
+          <span class="w-20 shrink-0 font-medium text-emerald-600"
+            >Published</span
+          >
+          <span
+            class="h-2 flex-1 overflow-hidden rounded-full bg-[var(--p-content-border-color)]"
+          >
+            <span
+              class="block h-full rounded-full bg-emerald-600"
+              [style.width.%]="(publishedFeedback / totalFeedback) * 100"
+            ></span>
+          </span>
+          <span class="shrink-0 text-muted-color"
+            >{{ publishedFeedback }}/{{ totalFeedback }}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -53,4 +53,9 @@ export const routes: Routes = [
         './features/interviews/interview-detail/interview-detail'
       ).then((m) => m.InterviewDetail),
   },
+  {
+    path: 'reports',
+    loadComponent: () =>
+      import('./features/reports/reports').then((m) => m.Reports),
+  },
 ];
