@@ -1,8 +1,8 @@
 <div class="flex flex-col gap-4">
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <h1 class="text-2xl font-semibold text-color">Interviews</h1>
+    <h1 class="text-2xl font-semibold text-color">Candidates</h1>
     <p-button
-      label="Add Interview"
+      label="Add Candidate"
       icon="pi pi-plus"
       (onClick)="openAddDialog()"
     />
@@ -10,7 +10,7 @@
 
   <div class="overflow-x-auto">
     <p-table
-      [value]="interviews()"
+      [value]="candidates()"
       dataKey="id"
       [paginator]="true"
       [rows]="10"
@@ -18,24 +18,24 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Candidate</th>
+          <th>Name</th>
+          <th>Email</th>
           <th>Position</th>
-          <th>Date</th>
           <th>Status</th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-interview>
-        <tr class="cursor-pointer" (click)="openDetail(interview.id)">
-          <td>{{ interview.candidate }}</td>
-          <td>{{ interview.position }}</td>
-          <td>{{ interview.date }}</td>
-          <td>{{ interview.status }}</td>
+      <ng-template pTemplate="body" let-candidate>
+        <tr class="cursor-pointer" (click)="openDetail(candidate.id)">
+          <td>{{ candidate.name }}</td>
+          <td>{{ candidate.email }}</td>
+          <td>{{ candidate.position }}</td>
+          <td>{{ candidate.status }}</td>
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="4" class="py-6 text-center text-muted-color">
-            No interviews yet.
+            No candidates yet.
           </td>
         </tr>
       </ng-template>

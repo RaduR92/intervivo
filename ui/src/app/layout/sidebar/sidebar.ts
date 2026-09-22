@@ -20,6 +20,7 @@ export class Sidebar {
 
   protected readonly navItems: NavItem[] = [
     { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
+    { label: 'Candidates', icon: 'pi pi-id-card', route: '/candidates' },
     { label: 'Interviews', icon: 'pi pi-users', route: '/interviews' },
   ];
 }

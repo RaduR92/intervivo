@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Button } from '@openng/optimus-ui/button';
 import { ThemeService } from '../../core/services/theme.service';
+import { LayoutService } from '../../core/services/layout.service';
 
 @Component({
   selector: 'app-header',
@@ -10,4 +11,5 @@ import { ThemeService } from '../../core/services/theme.service';
 })
 export class Header {
   protected readonly theme = inject(ThemeService);
+  protected readonly layout = inject(LayoutService);
 }
