@@ -1,1 +1,4 @@
 <h1 class="text-2xl font-semibold text-color">Dashboard</h1>
+@if (auth.currentUser(); as user) {
+  <p class="mt-2 text-sm text-muted-color">Welcome back, {{ user.email }}.</p>
+}

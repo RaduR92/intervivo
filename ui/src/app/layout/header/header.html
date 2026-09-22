@@ -13,12 +13,24 @@
     />
     <span class="text-lg font-semibold text-color">Intervivo</span>
   </div>
-  <p-button
-    [icon]="theme.dark() ? 'pi pi-sun' : 'pi pi-moon'"
-    severity="secondary"
-    text
-    rounded
-    (onClick)="theme.toggle()"
-    [ariaLabel]="theme.dark() ? 'Switch to light mode' : 'Switch to dark mode'"
-  />
+  <div class="flex items-center gap-1">
+    <p-button
+      [icon]="theme.dark() ? 'pi pi-sun' : 'pi pi-moon'"
+      severity="secondary"
+      text
+      rounded
+      (onClick)="theme.toggle()"
+      [ariaLabel]="
+        theme.dark() ? 'Switch to light mode' : 'Switch to dark mode'
+      "
+    />
+    <p-button
+      icon="pi pi-sign-out"
+      severity="secondary"
+      text
+      rounded
+      (onClick)="logout()"
+      ariaLabel="Log out"
+    />
+  </div>
 </header>
