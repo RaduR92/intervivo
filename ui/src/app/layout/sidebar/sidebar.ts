@@ -22,5 +22,6 @@ export class Sidebar {
     { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
     { label: 'Candidates', icon: 'pi pi-id-card', route: '/candidates' },
     { label: 'Interviews', icon: 'pi pi-users', route: '/interviews' },
+    { label: 'Reports', icon: 'pi pi-chart-bar', route: '/reports' },
   ];
 }
