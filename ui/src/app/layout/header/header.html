@@ -1,3 +1,13 @@
-<header class="flex h-16 shrink-0 items-center border-b border-surface-200 bg-surface-0 px-4">
+<header
+  class="flex h-16 shrink-0 items-center justify-between border-b border-surface bg-[var(--p-content-background)] px-4"
+>
   <span class="text-lg font-semibold text-color">Intervivo</span>
+  <p-button
+    [icon]="theme.dark() ? 'pi pi-sun' : 'pi pi-moon'"
+    severity="secondary"
+    text
+    rounded
+    (onClick)="theme.toggle()"
+    [ariaLabel]="theme.dark() ? 'Switch to light mode' : 'Switch to dark mode'"
+  />
 </header>

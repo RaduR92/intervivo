@@ -13,6 +13,7 @@ interface NavItem {
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive, Button],
   templateUrl: './sidebar.html',
+  styles: ':host { display: contents; }',
 })
 export class Sidebar {
   protected readonly layout = inject(LayoutService);

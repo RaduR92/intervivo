@@ -15,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideOptimus({
-      theme: { preset: Aura, options: { darkModeSelector: 'none' } },
+      theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } },
     }),
   ],
 };
