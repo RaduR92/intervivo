@@ -1,6 +1,8 @@
-<div class="p-8 flex flex-col gap-4">
-  <h1 class="text-3xl font-bold">Intervivo UI</h1>
-  <p-button label="Hello Optimus" severity="primary" />
+<div class="flex h-screen flex-col">
+  <app-header />
+  <div class="flex flex-1 overflow-hidden">
+    <app-sidebar />
+    <app-main />
+  </div>
+  <app-footer />
 </div>
-
-<router-outlet />
