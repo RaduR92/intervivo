@@ -6,6 +6,11 @@ ui/dist/
 api/dist/
 ui/.angular/
 api/src/generated/
+# TS incremental build cache — machine/state-specific, never portable across
+# checkouts. A committed copy caused tsc to emit corrupted output in CI
+# (wrong import extensions) because it reused a cache built against a
+# different filesystem state than the freshly-checked-out source.
+api/*.tsbuildinfo
 
 # env
 .env
