@@ -9,6 +9,8 @@ import { RedisModule } from './redis/redis.module.js';
 import { HealthController } from './health/health.controller.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
+import { InterviewsModule } from './interviews/interviews.module.js';
+import { FeedbackModule } from './feedback/feedback.module.js';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
 import { AppThrottlerGuard } from './common/throttler/app-throttler.guard.js';
 
@@ -19,6 +21,8 @@ import { AppThrottlerGuard } from './common/throttler/app-throttler.guard.js';
     RedisModule,
     AuthModule,
     UsersModule,
+    InterviewsModule,
+    FeedbackModule,
     // Baseline DoS guard for every route; individual endpoints tighten this
     // further with @Throttle({ default: { limit, ttl } }).
     ThrottlerModule.forRoot([

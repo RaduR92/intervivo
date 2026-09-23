@@ -25,6 +25,8 @@
       "@redis/*": ["./src/redis/*"],
       "@health/*": ["./src/health/*"],
       "@users/*": ["./src/users/*"],
+      "@interviews/*": ["./src/interviews/*"],
+      "@feedback/*": ["./src/feedback/*"],
       "@generated/*": ["./src/generated/*"]
     }
   }

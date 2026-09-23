@@ -4,6 +4,8 @@ import { PrismaService } from '@db/prisma.service.js';
 import { AppException } from '@common/errors/app.exception.js';
 import { USERS_ERROR_CODES } from '@common/errors/error-codes.js';
 import type { CandidateProfile, User } from '@generated/prisma/client.js';
+import { Role } from '@generated/prisma/enums.js';
+import type { AuthenticatedUser } from '@auth/interfaces/jwt-payload.interface.js';
 import { CreateCandidateDto } from './dto/create-candidate.dto.js';
 import { UpdateCandidateDto } from './dto/update-candidate.dto.js';
 import { CandidateResponseDto } from './dto/candidate-response.dto.js';
@@ -40,6 +42,24 @@ function toCandidateResponse(user: CandidateWithProfile): CandidateResponseDto {
   };
 }
 
+/**
+ * A CANDIDATE may only ever act on their own id. Denying with the same
+ * "not found" the caller would see for a genuinely missing id, rather than
+ * a 403, so a candidate probing other ids can't tell which ones exist.
+ */
+function assertOwnCandidateOrHr(
+  candidateId: string,
+  requester: AuthenticatedUser,
+): void {
+  if (requester.role === Role.CANDIDATE && requester.id !== candidateId) {
+    throw new AppException(
+      USERS_ERROR_CODES.CANDIDATE_NOT_FOUND,
+      'Candidate not found',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+}
+
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -63,7 +83,7 @@ export class UsersService {
         data: {
           email: dto.email,
           passwordHash,
-          role: 'CANDIDATE',
+          role: Role.CANDIDATE,
           firstName: dto.firstName,
           lastName: dto.lastName,
           candidateProfile: {
@@ -92,13 +112,13 @@ export class UsersService {
   ): Promise<PaginatedCandidatesResponseDto> {
     const [users, total] = await this.prisma.$transaction([
       this.prisma.user.findMany({
-        where: { role: 'CANDIDATE' },
+        where: { role: Role.CANDIDATE },
         include: { candidateProfile: true },
         orderBy: { createdAt: 'desc' },
         take,
         skip,
       }),
-      this.prisma.user.count({ where: { role: 'CANDIDATE' } }),
+      this.prisma.user.count({ where: { role: Role.CANDIDATE } }),
     ]);
 
     return {
@@ -109,12 +129,17 @@ export class UsersService {
     };
   }
 
-  async findCandidateById(id: string): Promise<CandidateResponseDto> {
+  async findCandidateById(
+    id: string,
+    requester: AuthenticatedUser,
+  ): Promise<CandidateResponseDto> {
+    assertOwnCandidateOrHr(id, requester);
+
     const user = await this.prisma.user.findUnique({
       where: { id },
       include: { candidateProfile: true },
     });
-    if (!user || user.role !== 'CANDIDATE') {
+    if (!user || user.role !== Role.CANDIDATE) {
       throw new AppException(
         USERS_ERROR_CODES.CANDIDATE_NOT_FOUND,
         'Candidate not found',
@@ -127,9 +152,12 @@ export class UsersService {
   async updateCandidateProfile(
     id: string,
     dto: UpdateCandidateDto,
+    requester: AuthenticatedUser,
   ): Promise<CandidateResponseDto> {
+    assertOwnCandidateOrHr(id, requester);
+
     const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user || user.role !== 'CANDIDATE') {
+    if (!user || user.role !== Role.CANDIDATE) {
       throw new AppException(
         USERS_ERROR_CODES.CANDIDATE_NOT_FOUND,
         'Candidate not found',

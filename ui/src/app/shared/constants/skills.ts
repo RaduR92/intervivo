@@ -1,0 +1,50 @@
+/**
+ * Mirrors api/src/users/constants/skills.ts exactly. The backend validates
+ * against its own copy independently — these two lists have to be kept in
+ * sync by hand (see api/README.md).
+ */
+export const SKILLS = [
+  'JavaScript',
+  'TypeScript',
+  'Python',
+  'Java',
+  'C#',
+  'C++',
+  'Go',
+  'Rust',
+  'Ruby',
+  'PHP',
+  'Kotlin',
+  'Swift',
+  'SQL',
+  'React',
+  'Angular',
+  'Vue',
+  'Node.js',
+  'NestJS',
+  'Express',
+  'Spring',
+  'Django',
+  'Flask',
+  '.NET',
+  'GraphQL',
+  'REST APIs',
+  'PostgreSQL',
+  'MySQL',
+  'MongoDB',
+  'Redis',
+  'Docker',
+  'Kubernetes',
+  'AWS',
+  'Azure',
+  'GCP',
+  'CI/CD',
+  'Terraform',
+  'Git',
+  'Testing/QA',
+  'System Design',
+  'Data Structures & Algorithms',
+  'Agile/Scrum',
+] as const;
+
+export type Skill = (typeof SKILLS)[number];

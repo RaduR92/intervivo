@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Button } from '@openng/optimus-ui/button';
 import { LayoutService } from '@core/services/layout.service';
 
-interface NavItem {
+export interface NavItem {
   label: string;
   icon: string;
   route: string;
@@ -18,10 +18,5 @@ interface NavItem {
 export class Sidebar {
   protected readonly layout = inject(LayoutService);
 
-  protected readonly navItems: NavItem[] = [
-    { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
-    { label: 'Candidates', icon: 'pi pi-id-card', route: '/candidates' },
-    { label: 'Interviews', icon: 'pi pi-users', route: '/interviews' },
-    { label: 'Reports', icon: 'pi pi-chart-bar', route: '/reports' },
-  ];
+  readonly navItems = input.required<NavItem[]>();
 }

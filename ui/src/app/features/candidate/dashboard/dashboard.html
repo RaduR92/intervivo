@@ -1,0 +1,72 @@
+<div class="flex flex-col gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold text-color">Dashboard</h1>
+    @if (auth.currentUser(); as user) {
+      <p class="mt-1 text-sm text-muted-color">
+        Welcome back, {{ user.firstName ?? user.email }}.
+      </p>
+    }
+  </div>
+
+  @if (profileIncomplete) {
+    <div
+      class="flex items-center justify-between gap-3 rounded-border border border-surface bg-[var(--p-content-background)] p-4"
+    >
+      <p class="text-sm text-color">
+        Your profile has no skills listed yet — add some so HR knows what
+        you're strong at.
+      </p>
+      <a
+        routerLink="/candidate/profile"
+        class="shrink-0 text-sm font-medium text-primary hover:underline"
+        >Complete profile</a
+      >
+    </div>
+  }
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+      <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+        Upcoming sessions
+      </p>
+      <p class="mt-2 text-2xl font-semibold text-color">{{ upcomingCount() }}</p>
+    </div>
+    <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+      <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+        Feedback received
+      </p>
+      <p class="mt-2 text-2xl font-semibold text-color">{{ feedbackCount() }}</p>
+    </div>
+    <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+      <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+        Skills listed
+      </p>
+      <p class="mt-2 text-2xl font-semibold text-color">
+        {{ profile()?.profile?.skills?.length ?? 0 }}
+      </p>
+    </div>
+  </div>
+
+  <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+    <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
+      Next interview
+    </p>
+    @if (nextSession(); as session) {
+      <div class="mt-3 flex flex-col gap-1">
+        <p class="text-lg font-medium text-color">{{ session.position }}</p>
+        <p class="text-sm text-muted-color">
+          {{ session.scheduledAt | date: 'medium' }} &middot;
+          {{ session.durationMinutes }} min with
+          {{ session.interviewer.firstName }} {{ session.interviewer.lastName }}
+        </p>
+      </div>
+    } @else if (!loading()) {
+      <p class="mt-3 text-sm text-muted-color">No upcoming interviews scheduled.</p>
+    }
+    <a
+      routerLink="/candidate/interviews"
+      class="mt-4 inline-block text-sm font-medium text-primary hover:underline"
+      >View all sessions</a
+    >
+  </div>
+</div>

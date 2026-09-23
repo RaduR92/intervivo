@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { ACCESS_TOKEN_TTL_SECONDS } from './auth.constants.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { RolesGuard } from '@common/guards/roles.guard.js';
 
 @Module({
   imports: [
@@ -21,7 +22,10 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
   controllers: [AuthController],
   providers: [
     AuthService,
+    // Order matters: JwtAuthGuard must populate request.user before
+    // RolesGuard can read request.user.role off it.
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class AuthModule {}

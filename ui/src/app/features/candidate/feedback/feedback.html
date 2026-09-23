@@ -1,0 +1,39 @@
+<div class="flex flex-col gap-4">
+  <h1 class="text-2xl font-semibold text-color">Feedback</h1>
+
+  @if (!loading() && items().length === 0) {
+    <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-6 text-center">
+      <p class="text-sm text-muted-color">No feedback has been shared with you yet.</p>
+    </div>
+  }
+
+  @for (item of items(); track item.id) {
+    <div class="flex flex-col gap-2 rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <p class="font-medium text-color">{{ item.session.position }}</p>
+        <span
+          class="rounded-full px-2 py-1 text-xs font-medium"
+          [class.bg-green-100]="item.recommendation === 'HIRE'"
+          [class.text-green-700]="item.recommendation === 'HIRE'"
+          [class.bg-amber-100]="item.recommendation === 'MAYBE'"
+          [class.text-amber-700]="item.recommendation === 'MAYBE'"
+          [class.bg-red-100]="item.recommendation === 'NO_HIRE'"
+          [class.text-red-700]="item.recommendation === 'NO_HIRE'"
+        >
+          {{ item.recommendation }}
+        </span>
+      </div>
+
+      @if (item.rating) {
+        <p class="text-sm text-muted-color">Rating: {{ item.rating }} / 5</p>
+      }
+
+      <p class="text-sm text-color">{{ item.comments }}</p>
+
+      <p class="text-xs text-muted-color">
+        {{ item.author.firstName }} {{ item.author.lastName }} &middot;
+        {{ item.session.scheduledAt | date: 'mediumDate' }}
+      </p>
+    </div>
+  }
+</div>
