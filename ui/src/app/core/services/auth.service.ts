@@ -3,9 +3,12 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 
+export type Role = 'HR' | 'CANDIDATE';
+
 export interface CurrentUser {
   id: string;
   email: string;
+  role: Role;
 }
 
 @Injectable({ providedIn: 'root' })

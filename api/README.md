@@ -25,6 +25,29 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Known limitations
+
+**The `User` ↔ `CandidateProfile` relationship is a database-unenforced
+invariant.** `User.role` is either `HR` or `CANDIDATE`; only `CANDIDATE` rows
+are meant to have a `CandidateProfile`. Postgres has no clean way to express
+"this row must exist if that column has this value" as a schema constraint
+without a trigger, so nothing at the database level stops an `HR` user from
+having a `CandidateProfile`, or a `CANDIDATE` user from existing without one.
+
+This is enforced at the application layer instead: `UsersService.createCandidate`
+is the *only* code path that creates a `CandidateProfile`, and it always
+creates the `User` and the `CandidateProfile` together inside one
+`prisma.$transaction`. Any future code that creates `User` rows directly
+(a bulk import, an admin script, a different registration flow) has to
+uphold this same invariant itself — the schema won't catch a violation.
+
+**The candidate skill list exists in two places.** The canonical list lives
+in `src/users/constants/skills.ts` and is what `CreateCandidateDto`/
+`UpdateCandidateDto` validate `skills: string[]` against. The frontend keeps
+its own copy for the HR-facing multi-select (hardcoded there deliberately —
+no shared-skills endpoint exists). The two lists have to be kept in sync by
+hand; there's no build-time or runtime check that they match.
+
 ## Project setup
 
 ```bash

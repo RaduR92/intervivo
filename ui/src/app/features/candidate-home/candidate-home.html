@@ -1,0 +1,41 @@
+<div class="flex min-h-screen flex-col bg-[var(--p-content-background)]">
+  <header
+    class="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-surface px-4 sm:px-6"
+  >
+    <span class="text-lg font-semibold text-color">Intervivo</span>
+    <div class="flex items-center gap-1">
+      <p-button
+        [icon]="theme.dark() ? 'pi pi-sun' : 'pi pi-moon'"
+        severity="secondary"
+        text
+        rounded
+        (onClick)="theme.toggle()"
+        [ariaLabel]="
+          theme.dark() ? 'Switch to light mode' : 'Switch to dark mode'
+        "
+      />
+      <p-button
+        icon="pi pi-sign-out"
+        severity="secondary"
+        text
+        rounded
+        (onClick)="logout()"
+        ariaLabel="Log out"
+      />
+    </div>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center px-4 py-10 sm:px-6">
+    <div class="w-full max-w-md text-center">
+      <h1 class="text-2xl font-semibold text-color">Welcome</h1>
+      @if (auth.currentUser(); as user) {
+        <p class="mt-2 text-sm text-muted-color">
+          You're signed in as {{ user.email }}.
+        </p>
+      }
+      <p class="mt-6 text-sm text-muted-color">
+        Your candidate dashboard is coming soon.
+      </p>
+    </div>
+  </main>
+</div>

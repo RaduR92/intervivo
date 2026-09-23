@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { candidateGuard, hrGuard } from '@core/guards/role.guard';
 
 export const routes: Routes = [
   // TODO: remove this once auth logic decides where to land the user
@@ -22,7 +23,16 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'candidate-home',
+    canActivate: [candidateGuard],
+    loadComponent: () =>
+      import('./features/candidate-home/candidate-home').then(
+        (m) => m.CandidateHome,
+      ),
+  },
+  {
     path: '',
+    canActivate: [hrGuard],
     loadComponent: () =>
       import('./layout/shell/shell').then((m) => m.Shell),
     children: [

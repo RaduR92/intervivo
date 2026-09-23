@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@generated/prisma/enums.js';
 
-/** The full "who am I" profile returned by GET /auth/me. */
-export class UserResponseDto {
+/** The minimal identity embedded in a session — returned by login/refresh. */
+export class SessionUserDto {
   @ApiProperty({ example: '20259ae5-746b-44d4-a3d0-c2d9aa3523ed' })
   id!: string;
 
@@ -11,10 +11,4 @@ export class UserResponseDto {
 
   @ApiProperty({ enum: Role, example: Role.HR })
   role!: Role;
-
-  @ApiProperty({ example: 'Alexander' })
-  firstName!: string;
-
-  @ApiProperty({ example: 'Systems' })
-  lastName!: string;
 }
