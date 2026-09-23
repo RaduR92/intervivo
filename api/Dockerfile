@@ -28,6 +28,11 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/prisma7.config.ts ./
 COPY --from=build /app/package.json ./
+# `prisma db seed` runs `tsx prisma/seed.ts`, which imports the *source*
+# generated client (src/generated/prisma/*.ts) and src/users/constants —
+# not the compiled dist/ output — so src/ has to be present in this image too.
+COPY --from=build /app/src ./src
+COPY --from=build /app/tsconfig.json ./
 
 EXPOSE 3000
 CMD ["node", "dist/main"]

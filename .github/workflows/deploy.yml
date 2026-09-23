@@ -16,6 +16,10 @@ jobs:
           cache-dependency-path: api/package-lock.json
       - run: npm ci --legacy-peer-deps
         working-directory: api
+      # nest build / vitest / oxlint all resolve @generated/prisma/* imports,
+      # which only exist after this runs — there is no postinstall hook for it.
+      - run: npx prisma generate
+        working-directory: api
       - run: npm run lint
         working-directory: api
       - run: npm run test
@@ -49,6 +53,10 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+      # build-push-action's cache-to/from: type=gha requires the buildx
+      # driver — the default `docker` driver on GitHub-hosted runners doesn't
+      # support GHA cache export and fails the build.
+      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -78,6 +86,7 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -127,4 +136,5 @@ jobs:
             docker compose -p intervivo -f docker-compose.prod.yml --env-file .env.prod pull
             docker compose -p intervivo -f docker-compose.prod.yml --env-file .env.prod up -d --remove-orphans
             docker compose -p intervivo -f docker-compose.prod.yml --env-file .env.prod exec -T api npx prisma migrate deploy
+            docker compose -p intervivo -f docker-compose.prod.yml --env-file .env.prod exec -T api npx prisma db seed
             docker image prune -f
