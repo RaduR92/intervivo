@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '@db/prisma.service.js';
 import { AppException } from '@common/errors/app.exception.js';
-import { FEEDBACK_ERROR_CODES } from '@common/errors/error-codes.js';
+import { COMMON_ERROR_CODES, FEEDBACK_ERROR_CODES } from '@common/errors/error-codes.js';
 import type { AuthenticatedUser } from '@auth/interfaces/jwt-payload.interface.js';
 import type { Feedback } from '@generated/prisma/client.js';
 import { Role } from '@generated/prisma/enums.js';
@@ -27,6 +27,8 @@ function toResponse(feedback: FeedbackWithRelations): FeedbackResponseDto {
     rating: feedback.rating,
     recommendation: feedback.recommendation,
     comments: feedback.comments,
+    strengths: feedback.strengths,
+    improvementAreas: feedback.improvementAreas,
     isPublished: feedback.isPublished,
     publishedAt: feedback.publishedAt,
     createdAt: feedback.createdAt,
@@ -53,12 +55,12 @@ export class FeedbackService {
     }
 
     const existing = await this.prisma.feedback.findUnique({
-      where: { sessionId: dto.sessionId },
+      where: { sessionId_authorId: { sessionId: dto.sessionId, authorId } },
     });
     if (existing) {
       throw new AppException(
         FEEDBACK_ERROR_CODES.FEEDBACK_ALREADY_EXISTS,
-        'Feedback already exists for this session',
+        'You have already left feedback for this session',
         HttpStatus.CONFLICT,
       );
     }
@@ -72,6 +74,8 @@ export class FeedbackService {
         rating: dto.rating,
         recommendation: dto.recommendation,
         comments: dto.comments,
+        strengths: dto.strengths,
+        improvementAreas: dto.improvementAreas,
         isPublished,
         publishedAt: isPublished ? new Date() : null,
       },
@@ -85,12 +89,12 @@ export class FeedbackService {
     query: ListFeedbackQueryDto,
     requester: AuthenticatedUser,
   ): Promise<PaginatedFeedbackResponseDto> {
+    const sessionFilter = query.sessionId ? { sessionId: query.sessionId } : {};
+
     const where =
       requester.role === Role.CANDIDATE
-        ? { candidateId: requester.id, isPublished: true }
-        : query.candidateId
-          ? { candidateId: query.candidateId }
-          : {};
+        ? { ...sessionFilter, candidateId: requester.id, isPublished: true }
+        : { ...sessionFilter, ...(query.candidateId ? { candidateId: query.candidateId } : {}) };
 
     const [items, total] = await this.prisma.$transaction([
       this.prisma.feedback.findMany({
@@ -125,13 +129,24 @@ export class FeedbackService {
     return toResponse(feedback);
   }
 
-  async update(id: string, dto: UpdateFeedbackDto): Promise<FeedbackResponseDto> {
+  async update(
+    id: string,
+    dto: UpdateFeedbackDto,
+    requester: AuthenticatedUser,
+  ): Promise<FeedbackResponseDto> {
     const existing = await this.prisma.feedback.findUnique({ where: { id } });
     if (!existing) {
       throw new AppException(
         FEEDBACK_ERROR_CODES.FEEDBACK_NOT_FOUND,
         'Feedback not found',
         HttpStatus.NOT_FOUND,
+      );
+    }
+    if (existing.authorId !== requester.id) {
+      throw new AppException(
+        COMMON_ERROR_CODES.FORBIDDEN,
+        'You can only edit your own feedback',
+        HttpStatus.FORBIDDEN,
       );
     }
 
@@ -148,6 +163,8 @@ export class FeedbackService {
         rating: dto.rating,
         recommendation: dto.recommendation,
         comments: dto.comments,
+        strengths: dto.strengths,
+        improvementAreas: dto.improvementAreas,
         isPublished: dto.isPublished,
         publishedAt,
       },

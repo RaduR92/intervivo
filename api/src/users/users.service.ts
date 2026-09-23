@@ -8,6 +8,7 @@ import { Role } from '@generated/prisma/enums.js';
 import type { AuthenticatedUser } from '@auth/interfaces/jwt-payload.interface.js';
 import { CreateCandidateDto } from './dto/create-candidate.dto.js';
 import { UpdateCandidateDto } from './dto/update-candidate.dto.js';
+import { ListCandidatesQueryDto } from './dto/list-candidates-query.dto.js';
 import { CandidateResponseDto } from './dto/candidate-response.dto.js';
 import { PaginatedCandidatesResponseDto } from './dto/paginated-candidates-response.dto.js';
 
@@ -107,25 +108,36 @@ export class UsersService {
   }
 
   async findAllCandidates(
-    take: number,
-    skip: number,
+    query: ListCandidatesQueryDto,
   ): Promise<PaginatedCandidatesResponseDto> {
+    const searchFilter = query.search
+      ? {
+          OR: [
+            { firstName: { contains: query.search, mode: 'insensitive' as const } },
+            { lastName: { contains: query.search, mode: 'insensitive' as const } },
+            { email: { contains: query.search, mode: 'insensitive' as const } },
+          ],
+        }
+      : {};
+
+    const where = { role: Role.CANDIDATE, ...searchFilter };
+
     const [users, total] = await this.prisma.$transaction([
       this.prisma.user.findMany({
-        where: { role: Role.CANDIDATE },
+        where,
         include: { candidateProfile: true },
         orderBy: { createdAt: 'desc' },
-        take,
-        skip,
+        take: query.take,
+        skip: query.skip,
       }),
-      this.prisma.user.count({ where: { role: Role.CANDIDATE } }),
+      this.prisma.user.count({ where }),
     ]);
 
     return {
       data: users.map(toCandidateResponse),
       total,
-      take,
-      skip,
+      take: query.take,
+      skip: query.skip,
     };
   }
 

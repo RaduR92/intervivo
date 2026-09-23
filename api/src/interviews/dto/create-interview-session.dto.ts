@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -9,6 +10,9 @@ import {
   Max,
   Min,
 } from 'class-validator';
+import { InterviewType } from '@generated/prisma/enums.js';
+
+const TYPE_VALUES = Object.values(InterviewType);
 
 export class CreateInterviewSessionDto {
   @ApiProperty({ example: 'c207ee72-4f44-4a24-9747-5a438a181f13' })
@@ -32,6 +36,10 @@ export class CreateInterviewSessionDto {
   @ApiProperty({ example: 'Senior Software Engineer' })
   @IsString()
   position!: string;
+
+  @ApiProperty({ enum: TYPE_VALUES, example: InterviewType.TECHNICAL })
+  @IsIn(TYPE_VALUES)
+  type!: InterviewType;
 
   @ApiProperty({ required: false, example: 'https://meet.example.com/abc' })
   @IsOptional()

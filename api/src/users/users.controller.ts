@@ -67,7 +67,7 @@ export class UsersController {
   async findAll(
     @Query() query: ListCandidatesQueryDto,
   ): Promise<PaginatedCandidatesResponseDto> {
-    return this.usersService.findAllCandidates(query.take, query.skip);
+    return this.usersService.findAllCandidates(query);
   }
 
   @Get(':id')

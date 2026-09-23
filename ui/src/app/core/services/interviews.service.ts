@@ -4,7 +4,39 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from '@core/config/api.config';
 import { PersonSummary } from '@core/models/person-summary.model';
 
-export type InterviewStatus = 'SCHEDULED' | 'COMPLETED' | 'CANCELLED';
+export const InterviewStatus = {
+  SCHEDULED: 'SCHEDULED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+} as const;
+
+export type InterviewStatus = (typeof InterviewStatus)[keyof typeof InterviewStatus];
+
+export const INTERVIEW_STATUS_LABELS: Record<InterviewStatus, string> = {
+  SCHEDULED: 'Scheduled',
+  IN_PROGRESS: 'In Progress',
+  COMPLETED: 'Completed',
+  CANCELLED: 'Cancelled',
+};
+
+export const InterviewType = {
+  TECHNICAL: 'TECHNICAL',
+  BEHAVIORAL: 'BEHAVIORAL',
+  SYSTEM_DESIGN: 'SYSTEM_DESIGN',
+  CASE_STUDY: 'CASE_STUDY',
+  CULTURE_FIT: 'CULTURE_FIT',
+} as const;
+
+export type InterviewType = (typeof InterviewType)[keyof typeof InterviewType];
+
+export const INTERVIEW_TYPE_LABELS: Record<InterviewType, string> = {
+  TECHNICAL: 'Technical',
+  BEHAVIORAL: 'Behavioral',
+  SYSTEM_DESIGN: 'System Design',
+  CASE_STUDY: 'Case Study',
+  CULTURE_FIT: 'Culture Fit',
+};
 
 export interface InterviewSession {
   id: string;
@@ -13,6 +45,7 @@ export interface InterviewSession {
   scheduledAt: string;
   durationMinutes: number;
   position: string;
+  type: InterviewType;
   status: InterviewStatus;
   meetingLink: string | null;
   notes: string | null;
@@ -32,6 +65,7 @@ export interface CreateInterviewSessionPayload {
   scheduledAt: string;
   durationMinutes: number;
   position: string;
+  type: InterviewType;
   meetingLink?: string;
   notes?: string;
 }
@@ -41,6 +75,7 @@ export interface UpdateInterviewSessionPayload {
   scheduledAt?: string;
   durationMinutes?: number;
   position?: string;
+  type?: InterviewType;
   status?: InterviewStatus;
   meetingLink?: string;
   notes?: string;
@@ -48,6 +83,9 @@ export interface UpdateInterviewSessionPayload {
 
 export interface ListInterviewSessionsParams {
   section?: 'upcoming' | 'history';
+  status?: InterviewStatus;
+  type?: InterviewType;
+  search?: string;
   candidateId?: string;
   take?: number;
   skip?: number;
@@ -65,6 +103,9 @@ export class InterviewsService {
   list(params: ListInterviewSessionsParams = {}): Observable<PaginatedInterviewSessions> {
     let httpParams = new HttpParams();
     if (params.section) httpParams = httpParams.set('section', params.section);
+    if (params.status) httpParams = httpParams.set('status', params.status);
+    if (params.type) httpParams = httpParams.set('type', params.type);
+    if (params.search) httpParams = httpParams.set('search', params.search);
     if (params.candidateId) httpParams = httpParams.set('candidateId', params.candidateId);
     if (params.take !== undefined) httpParams = httpParams.set('take', params.take);
     if (params.skip !== undefined) httpParams = httpParams.set('skip', params.skip);

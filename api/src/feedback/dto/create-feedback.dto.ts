@@ -19,11 +19,11 @@ export class CreateFeedbackDto {
   @IsUUID()
   sessionId!: string;
 
-  @ApiPropertyOptional({ example: 4, minimum: 1, maximum: 5 })
+  @ApiPropertyOptional({ example: 8, minimum: 1, maximum: 10 })
   @IsOptional()
   @IsInt()
   @Min(1)
-  @Max(5)
+  @Max(10)
   rating?: number;
 
   @ApiProperty({ enum: RECOMMENDATION_VALUES, example: Recommendation.HIRE })
@@ -34,6 +34,16 @@ export class CreateFeedbackDto {
   @IsString()
   @MinLength(1)
   comments!: string;
+
+  @ApiPropertyOptional({ example: 'Deep systems knowledge, calm under pressure.' })
+  @IsOptional()
+  @IsString()
+  strengths?: string;
+
+  @ApiPropertyOptional({ example: 'Could be more concise when explaining trade-offs.' })
+  @IsOptional()
+  @IsString()
+  improvementAreas?: string;
 
   @ApiPropertyOptional({
     default: false,

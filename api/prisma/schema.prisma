@@ -23,14 +23,14 @@ enum Role {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
+  id           String   @id @default(uuid())
+  email        String   @unique
   passwordHash String
   role         Role
   firstName    String
   lastName     String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   refreshToken     RefreshToken?
   resetTokens      PasswordResetToken[]
@@ -63,8 +63,17 @@ model CandidateProfile {
 
 enum InterviewStatus {
   SCHEDULED
+  IN_PROGRESS
   COMPLETED
   CANCELLED
+}
+
+enum InterviewType {
+  TECHNICAL
+  BEHAVIORAL
+  SYSTEM_DESIGN
+  CASE_STUDY
+  CULTURE_FIT
 }
 
 enum Recommendation {
@@ -82,37 +91,43 @@ model InterviewSession {
   scheduledAt     DateTime
   durationMinutes Int
   position        String
+  type            InterviewType
   status          InterviewStatus @default(SCHEDULED)
   meetingLink     String?
   notes           String?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  feedback Feedback?
+  feedback Feedback[]
 
   @@index([candidateId])
   @@index([interviewerId])
 }
 
-// One feedback per session (sessionId is unique below), authored by the
-// interviewer. isPublished gates candidate visibility — see the Feedback
-// module's service for the enforcement (candidates never see drafts).
+// One feedback per (session, author) — a session can carry feedback from
+// more than one HR user (e.g. a panel interview, or a second opinion), but
+// each HR user can only leave one entry per session. isPublished gates
+// candidate visibility — see the Feedback module's service for the
+// enforcement (candidates never see drafts).
 model Feedback {
-  id             String           @id @default(uuid())
-  sessionId      String           @unique
-  session        InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  authorId       String
-  author         User             @relation("FeedbackAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  candidateId    String
-  candidate      User             @relation("CandidateFeedback", fields: [candidateId], references: [id], onDelete: Cascade)
-  rating         Int?
-  recommendation Recommendation
-  comments       String
-  isPublished    Boolean          @default(false)
-  publishedAt    DateTime?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id               String           @id @default(uuid())
+  sessionId        String
+  session          InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  authorId         String
+  author           User             @relation("FeedbackAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  candidateId      String
+  candidate        User             @relation("CandidateFeedback", fields: [candidateId], references: [id], onDelete: Cascade)
+  rating           Int?
+  recommendation   Recommendation
+  comments         String
+  strengths        String?
+  improvementAreas String?
+  isPublished      Boolean          @default(false)
+  publishedAt      DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
+  @@unique([sessionId, authorId])
   @@index([candidateId])
 }
 

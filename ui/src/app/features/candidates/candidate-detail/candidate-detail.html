@@ -11,93 +11,253 @@
     <h1 class="text-2xl font-semibold text-color">Candidate</h1>
   </div>
 
-  <div class="flex max-w-md flex-col gap-4">
-    <div class="flex flex-col gap-1">
-      <label for="candidate-name" class="text-sm text-muted-color">Name</label>
-      <input
-        id="candidate-name"
-        type="text"
-        pInputText
-        class="w-full"
-        [ngModel]="name()"
-        (ngModelChange)="name.set($event)"
-      />
-    </div>
+  @if (candidate(); as c) {
+    <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-semibold text-color">{{ c.firstName }} {{ c.lastName }}</h2>
+          @if (c.profile.currentRole || c.profile.yearsExperience) {
+            <p class="mt-1 text-sm text-muted-color">
+              @if (c.profile.currentRole) {
+                {{ c.profile.currentRole }}
+              }
+              @if (c.profile.currentRole && c.profile.yearsExperience) {
+                &middot;
+              }
+              @if (c.profile.yearsExperience) {
+                {{ c.profile.yearsExperience }}y experience
+              }
+            </p>
+          }
+        </div>
+        @if (!editing()) {
+          <p-button label="Edit Profile" severity="secondary" size="small" (onClick)="startEditing()" />
+        }
+      </div>
 
-    <div class="flex flex-col gap-1">
-      <label for="candidate-email" class="text-sm text-muted-color"
-        >Email</label
-      >
-      <input
-        id="candidate-email"
-        type="email"
-        pInputText
-        class="w-full"
-        [ngModel]="email()"
-        (ngModelChange)="email.set($event)"
-      />
-    </div>
+      @if (!editing()) {
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="flex flex-col gap-3">
+            <div>
+              <p class="text-xs font-medium tracking-wide text-muted-color uppercase">Email</p>
+              <p class="mt-1 text-color">{{ c.email }}</p>
+            </div>
+            <div>
+              <p class="text-xs font-medium tracking-wide text-muted-color uppercase">Joined</p>
+              <p class="mt-1 text-color">{{ c.createdAt | date: 'mediumDate' }}</p>
+            </div>
+          </div>
+          <div class="flex flex-col gap-3">
+            <div>
+              <p class="text-xs font-medium tracking-wide text-muted-color uppercase">Phone</p>
+              <p class="mt-1 text-color">{{ c.profile.phone || '—' }}</p>
+            </div>
+            <div>
+              <p class="text-xs font-medium tracking-wide text-muted-color uppercase">Avg Score</p>
+              @if (avgScore(); as score) {
+                <p class="mt-1 font-medium text-green-600">{{ score.toFixed(1) }}/10</p>
+              } @else {
+                <p class="mt-1 text-color">—</p>
+              }
+            </div>
+          </div>
+        </div>
 
-    <div class="flex flex-col gap-1">
-      <label for="candidate-position" class="text-sm text-muted-color"
-        >Position</label
-      >
-      <input
-        id="candidate-position"
-        type="text"
-        pInputText
-        class="w-full"
-        [ngModel]="position()"
-        (ngModelChange)="position.set($event)"
-      />
-    </div>
+        <div class="mt-4">
+          <p class="text-xs font-medium tracking-wide text-muted-color uppercase">Skills</p>
+          <div class="mt-2 flex flex-wrap gap-1">
+            @for (skill of c.profile.skills; track skill) {
+              <span class="rounded-full bg-surface px-2 py-1 text-xs font-medium text-muted-color">
+                {{ skill }}
+              </span>
+            } @empty {
+              <span class="text-sm text-muted-color">No skills listed.</span>
+            }
+          </div>
+        </div>
 
-    <div class="flex flex-col gap-1">
-      <label for="candidate-status" class="text-sm text-muted-color"
-        >Status</label
-      >
-      <input
-        id="candidate-status"
-        type="text"
-        pInputText
-        class="w-full"
-        [ngModel]="status()"
-        (ngModelChange)="status.set($event)"
-      />
-    </div>
+        @if (c.profile.notes) {
+          <div class="mt-4 border-t border-surface pt-4">
+            <p class="text-xs font-medium tracking-wide text-muted-color uppercase">Notes</p>
+            <p class="mt-2 text-sm text-color">{{ c.profile.notes }}</p>
+          </div>
+        }
+      } @else {
+        <form class="mt-4 flex flex-col gap-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="flex flex-col gap-1">
+              <label for="phone" class="text-sm text-color">Phone</label>
+              <input
+                id="phone"
+                type="text"
+                pInputText
+                class="w-full"
+                [ngModel]="phone()"
+                (ngModelChange)="phone.set($event)"
+                name="phone"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="yearsExperience" class="text-sm text-color">Years of experience</label>
+              <p-inputNumber
+                inputId="yearsExperience"
+                [min]="0"
+                [ngModel]="yearsExperience()"
+                (ngModelChange)="yearsExperience.set($event)"
+                name="yearsExperience"
+                styleClass="w-full"
+              />
+            </div>
+          </div>
 
-    <div class="flex gap-2 pt-2">
-      <p-button label="Save" (onClick)="save()" />
-      <p-button label="Cancel" severity="secondary" text (onClick)="back()" />
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="flex flex-col gap-1">
+              <label for="currentRole" class="text-sm text-color">Current role</label>
+              <input
+                id="currentRole"
+                type="text"
+                pInputText
+                class="w-full"
+                [ngModel]="currentRole()"
+                (ngModelChange)="currentRole.set($event)"
+                name="currentRole"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="targetRole" class="text-sm text-color">Target role</label>
+              <input
+                id="targetRole"
+                type="text"
+                pInputText
+                class="w-full"
+                [ngModel]="targetRole()"
+                (ngModelChange)="targetRole.set($event)"
+                name="targetRole"
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label for="resumeUrl" class="text-sm text-color">Resume URL</label>
+            <input
+              id="resumeUrl"
+              type="url"
+              pInputText
+              class="w-full"
+              [ngModel]="resumeUrl()"
+              (ngModelChange)="resumeUrl.set($event)"
+              name="resumeUrl"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <span class="text-sm text-color">Skills</span>
+            <app-skill-select [value]="skills()" (valueChange)="skills.set($event)" />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label for="notes" class="text-sm text-color">Notes</label>
+            <textarea
+              id="notes"
+              pTextarea
+              rows="3"
+              class="w-full"
+              [ngModel]="notes()"
+              (ngModelChange)="notes.set($event)"
+              name="notes"
+            ></textarea>
+          </div>
+
+          <div class="flex gap-2">
+            <p-button label="Save" [loading]="saving()" (onClick)="saveProfile()" />
+            <p-button label="Cancel" severity="secondary" text (onClick)="cancelEditing()" />
+          </div>
+        </form>
+      }
     </div>
-  </div>
+  } @else if (!loading()) {
+    <p class="text-muted-color">Candidate not found.</p>
+  }
 
   <div class="flex flex-col gap-3">
-    <h2 class="text-lg font-semibold text-color">Interview History</h2>
-    <div class="overflow-x-auto">
-      <p-table [value]="interviewHistory()" dataKey="id">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Position</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-interview>
-          <tr>
-            <td>{{ interview.position }}</td>
-            <td>{{ interview.date }}</td>
-            <td>{{ interview.status }}</td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="3" class="py-6 text-center text-muted-color">
-              No interview history yet.
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
+    <h2 class="text-sm font-medium tracking-wide text-muted-color uppercase">
+      Interview History ({{ sessions().length }})
+    </h2>
+
+    @if (!loading() && sessions().length === 0) {
+      <p class="text-sm text-muted-color">No interviews scheduled yet.</p>
+    }
+
+    @for (session of sessions(); track session.id) {
+      <div class="flex flex-col gap-2 rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="rounded-full bg-surface px-2 py-1 text-xs font-medium text-muted-color">
+              {{ typeLabels[session.type] }}
+            </span>
+            <span
+              class="rounded-full px-2 py-1 text-xs font-medium"
+              [class.bg-blue-100]="session.status === InterviewStatus.SCHEDULED"
+              [class.text-blue-700]="session.status === InterviewStatus.SCHEDULED"
+              [class.bg-amber-100]="session.status === InterviewStatus.IN_PROGRESS"
+              [class.text-amber-700]="session.status === InterviewStatus.IN_PROGRESS"
+              [class.bg-green-100]="session.status === InterviewStatus.COMPLETED"
+              [class.text-green-700]="session.status === InterviewStatus.COMPLETED"
+              [class.bg-red-100]="session.status === InterviewStatus.CANCELLED"
+              [class.text-red-700]="session.status === InterviewStatus.CANCELLED"
+            >
+              {{ statusLabels[session.status] }}
+            </span>
+          </div>
+          <p class="text-sm text-muted-color">
+            {{ session.scheduledAt | date: 'mediumDate' }} &middot; {{ session.durationMinutes }}m
+          </p>
+        </div>
+
+        @if (session.notes) {
+          <p class="text-sm text-muted-color">{{ session.notes }}</p>
+        }
+
+        @for (item of feedbackFor(session.id); track item.id) {
+          <div class="flex flex-col gap-2 rounded-border border border-surface bg-surface p-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="rounded-full px-2 py-1 text-xs font-medium"
+                [class.bg-green-100]="item.recommendation === Recommendation.HIRE"
+                [class.text-green-700]="item.recommendation === Recommendation.HIRE"
+                [class.bg-amber-100]="item.recommendation === Recommendation.MAYBE"
+                [class.text-amber-700]="item.recommendation === Recommendation.MAYBE"
+                [class.bg-red-100]="item.recommendation === Recommendation.NO_HIRE"
+                [class.text-red-700]="item.recommendation === Recommendation.NO_HIRE"
+              >
+                {{ recommendationLabels[item.recommendation] }}
+              </span>
+              @if (item.rating) {
+                <span class="text-sm text-color">{{ item.rating }}/10</span>
+              }
+              @if (!item.isPublished) {
+                <span class="rounded-full bg-surface px-2 py-1 text-xs font-medium text-muted-color"
+                  >Draft</span
+                >
+              }
+              <span class="text-xs text-muted-color"
+                >by {{ item.author.firstName }} {{ item.author.lastName }}</span
+              >
+            </div>
+            <p class="text-sm text-color">{{ item.comments }}</p>
+            @if (item.strengths) {
+              <p class="text-sm text-color">
+                <span class="text-green-600">+</span> {{ item.strengths }}
+              </p>
+            }
+            @if (item.improvementAreas) {
+              <p class="text-sm text-color">
+                <span class="text-amber-600">~</span> {{ item.improvementAreas }}
+              </p>
+            }
+          </div>
+        }
+      </div>
+    }
   </div>
 </div>

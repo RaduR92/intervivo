@@ -14,11 +14,11 @@ import { Recommendation } from '@generated/prisma/enums.js';
 const RECOMMENDATION_VALUES = Object.values(Recommendation);
 
 export class UpdateFeedbackDto {
-  @ApiPropertyOptional({ example: 4, minimum: 1, maximum: 5 })
+  @ApiPropertyOptional({ example: 8, minimum: 1, maximum: 10 })
   @IsOptional()
   @IsInt()
   @Min(1)
-  @Max(5)
+  @Max(10)
   rating?: number;
 
   @ApiPropertyOptional({ enum: RECOMMENDATION_VALUES, example: Recommendation.HIRE })
@@ -31,6 +31,16 @@ export class UpdateFeedbackDto {
   @IsString()
   @MinLength(1)
   comments?: string;
+
+  @ApiPropertyOptional({ example: 'Deep systems knowledge, calm under pressure.' })
+  @IsOptional()
+  @IsString()
+  strengths?: string;
+
+  @ApiPropertyOptional({ example: 'Could be more concise when explaining trade-offs.' })
+  @IsOptional()
+  @IsString()
+  improvementAreas?: string;
 
   @ApiPropertyOptional({ description: 'Toggle candidate visibility.' })
   @IsOptional()

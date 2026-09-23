@@ -4,7 +4,19 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from '@core/config/api.config';
 import { PersonSummary } from '@core/models/person-summary.model';
 
-export type Recommendation = 'HIRE' | 'NO_HIRE' | 'MAYBE';
+export const Recommendation = {
+  HIRE: 'HIRE',
+  NO_HIRE: 'NO_HIRE',
+  MAYBE: 'MAYBE',
+} as const;
+
+export type Recommendation = (typeof Recommendation)[keyof typeof Recommendation];
+
+export const RECOMMENDATION_LABELS: Record<Recommendation, string> = {
+  HIRE: 'Hire',
+  NO_HIRE: 'No Hire',
+  MAYBE: 'Maybe',
+};
 
 export interface FeedbackSessionSummary {
   id: string;
@@ -19,6 +31,8 @@ export interface Feedback {
   rating: number | null;
   recommendation: Recommendation;
   comments: string;
+  strengths: string | null;
+  improvementAreas: string | null;
   isPublished: boolean;
   publishedAt: string | null;
   createdAt: string;
@@ -36,6 +50,8 @@ export interface CreateFeedbackPayload {
   rating?: number;
   recommendation: Recommendation;
   comments: string;
+  strengths?: string;
+  improvementAreas?: string;
   isPublished?: boolean;
 }
 
@@ -43,11 +59,14 @@ export interface UpdateFeedbackPayload {
   rating?: number;
   recommendation?: Recommendation;
   comments?: string;
+  strengths?: string;
+  improvementAreas?: string;
   isPublished?: boolean;
 }
 
 export interface ListFeedbackParams {
   candidateId?: string;
+  sessionId?: string;
   take?: number;
   skip?: number;
 }
@@ -64,6 +83,7 @@ export class FeedbackService {
   list(params: ListFeedbackParams = {}): Observable<PaginatedFeedback> {
     let httpParams = new HttpParams();
     if (params.candidateId) httpParams = httpParams.set('candidateId', params.candidateId);
+    if (params.sessionId) httpParams = httpParams.set('sessionId', params.sessionId);
     if (params.take !== undefined) httpParams = httpParams.set('take', params.take);
     if (params.skip !== undefined) httpParams = httpParams.set('skip', params.skip);
 

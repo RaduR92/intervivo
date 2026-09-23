@@ -1,44 +1,80 @@
 <div class="overflow-x-auto">
-  <p-table [value]="sessions()" dataKey="id" [rowHover]="true">
+  <p-table
+    [value]="sessions()"
+    dataKey="id"
+    [rowHover]="true"
+    [paginator]="paginated()"
+    [rows]="10"
+  >
     <ng-template pTemplate="header">
       <tr>
-        <th>Position</th>
         <th>{{ perspective() === 'candidate' ? 'Interviewer' : 'Candidate' }}</th>
         <th>Date &amp; time</th>
-        <th>Duration</th>
+        <th>Type</th>
         <th>Status</th>
+        <th>Duration</th>
+        <th>Notes</th>
+        @if (perspective() === 'hr') {
+          <th class="text-right">Actions</th>
+        }
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-session>
       <tr class="cursor-pointer" (click)="rowClick.emit(session)">
-        <td>{{ session.position }}</td>
         <td>
           @if (perspective() === 'candidate') {
-            {{ session.interviewer.firstName }} {{ session.interviewer.lastName }}
+            <p class="text-color">{{ session.interviewer.firstName }} {{ session.interviewer.lastName }}</p>
           } @else {
-            {{ session.candidate.firstName }} {{ session.candidate.lastName }}
+            <p class="text-color">{{ session.candidate.firstName }} {{ session.candidate.lastName }}</p>
           }
+          <p class="text-xs text-muted-color">{{ session.position }}</p>
         </td>
-        <td>{{ session.scheduledAt | date: 'medium' }}</td>
-        <td>{{ session.durationMinutes }} min</td>
+        <td>
+          <p class="text-color">{{ session.scheduledAt | date: 'mediumDate' }}</p>
+          <p class="text-xs text-muted-color">{{ session.scheduledAt | date: 'shortTime' }}</p>
+        </td>
+        <td>
+          <span
+            class="rounded-full bg-surface px-2 py-1 text-xs font-medium text-muted-color"
+          >
+            {{ typeLabel(session.type) }}
+          </span>
+        </td>
         <td>
           <span
             class="rounded-full px-2 py-1 text-xs font-medium"
-            [class.bg-blue-100]="session.status === 'SCHEDULED'"
-            [class.text-blue-700]="session.status === 'SCHEDULED'"
-            [class.bg-green-100]="session.status === 'COMPLETED'"
-            [class.text-green-700]="session.status === 'COMPLETED'"
-            [class.bg-red-100]="session.status === 'CANCELLED'"
-            [class.text-red-700]="session.status === 'CANCELLED'"
+            [class.bg-blue-100]="session.status === InterviewStatus.SCHEDULED"
+            [class.text-blue-700]="session.status === InterviewStatus.SCHEDULED"
+            [class.bg-amber-100]="session.status === InterviewStatus.IN_PROGRESS"
+            [class.text-amber-700]="session.status === InterviewStatus.IN_PROGRESS"
+            [class.bg-green-100]="session.status === InterviewStatus.COMPLETED"
+            [class.text-green-700]="session.status === InterviewStatus.COMPLETED"
+            [class.bg-red-100]="session.status === InterviewStatus.CANCELLED"
+            [class.text-red-700]="session.status === InterviewStatus.CANCELLED"
           >
-            {{ session.status }}
+            {{ statusLabel(session.status) }}
           </span>
         </td>
+        <td>{{ session.durationMinutes }}m</td>
+        <td class="max-w-48">
+          <p class="truncate text-sm text-muted-color">{{ session.notes || '—' }}</p>
+        </td>
+        @if (perspective() === 'hr') {
+          <td class="text-right">
+            <p-button
+              label="View"
+              severity="secondary"
+              text
+              size="small"
+              (onClick)="rowClick.emit(session); $event.stopPropagation()"
+            />
+          </td>
+        }
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="5" class="py-6 text-center text-muted-color">
+        <td [attr.colspan]="perspective() === 'hr' ? 7 : 6" class="py-6 text-center text-muted-color">
           {{ emptyMessage() }}
         </td>
       </tr>

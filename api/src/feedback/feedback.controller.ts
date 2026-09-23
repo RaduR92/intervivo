@@ -47,8 +47,10 @@ export class FeedbackController {
   @ApiOperation({
     summary: 'Write feedback for an interview session (HR only)',
     description:
-      'One feedback per session. Defaults to a draft (isPublished: false) ' +
-      "the candidate can't see until explicitly published.",
+      'One feedback per (session, HR author) — different HR users can each ' +
+      'leave their own entry on the same session, but not more than one ' +
+      "each. Defaults to a draft (isPublished: false) the candidate can't " +
+      'see until explicitly published.',
   })
   @ApiCreatedResponse({ type: FeedbackResponseDto })
   @ApiNotFoundResponse({ type: ErrorResponseDto })
@@ -96,14 +98,18 @@ export class FeedbackController {
 
   @Patch(':id')
   @Roles(Role.HR)
-  @ApiOperation({ summary: 'Edit feedback, including the publish toggle (HR only)' })
+  @ApiOperation({
+    summary: 'Edit feedback, including the publish toggle (HR only, author only)',
+    description: 'Only the HR user who wrote this feedback can edit it.',
+  })
   @ApiOkResponse({ type: FeedbackResponseDto })
   @ApiNotFoundResponse({ type: ErrorResponseDto })
   @ApiForbiddenResponse({ type: ErrorResponseDto })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateFeedbackDto,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<FeedbackResponseDto> {
-    return this.feedbackService.update(id, dto);
+    return this.feedbackService.update(id, dto, user);
   }
 }
