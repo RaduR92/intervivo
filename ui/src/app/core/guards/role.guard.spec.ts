@@ -13,7 +13,7 @@ import {
 } from '@angular/router';
 import { firstValueFrom, Observable } from 'rxjs';
 import { API_BASE_URL } from '@core/config/api.config';
-import { AuthService } from '@core/services/auth.service';
+import { AuthService, Role } from '@core/services/auth.service';
 import { candidateGuard, hrGuard } from './role.guard';
 
 describe('role guards', () => {
@@ -50,7 +50,7 @@ describe('role guards', () => {
     TestBed.inject(AuthService).currentUser.set({
       id: '1',
       email: 'hr@test.internal',
-      role: 'HR',
+      role: Role.HR,
     });
 
     await expect(runGuard(hrGuard)).resolves.toBe(true);
@@ -60,19 +60,19 @@ describe('role guards', () => {
     TestBed.inject(AuthService).currentUser.set({
       id: '1',
       email: 'candidate@test.internal',
-      role: 'CANDIDATE',
+      role: Role.CANDIDATE,
     });
 
     const result = await runGuard(hrGuard);
     expect(result).toBeInstanceOf(UrlTree);
-    expect(router.serializeUrl(result as UrlTree)).toBe('/candidate-home');
+    expect(router.serializeUrl(result as UrlTree)).toBe('/candidate/dashboard');
   });
 
   it('redirects an already-loaded HR user away from candidateGuard to their own home', async () => {
     TestBed.inject(AuthService).currentUser.set({
       id: '1',
       email: 'hr@test.internal',
-      role: 'HR',
+      role: Role.HR,
     });
 
     const result = await runGuard(candidateGuard);
@@ -85,7 +85,7 @@ describe('role guards', () => {
 
     httpMock
       .expectOne(`${API_BASE_URL}/auth/me`)
-      .flush({ id: '1', email: 'hr@test.internal', role: 'HR' });
+      .flush({ id: '1', email: 'hr@test.internal', role: Role.HR });
 
     await expect(resultPromise).resolves.toBe(true);
   });

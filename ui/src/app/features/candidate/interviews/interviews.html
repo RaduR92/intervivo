@@ -1,0 +1,25 @@
+<div class="flex flex-col gap-6">
+  <h1 class="text-2xl font-semibold text-color">Interview Sessions</h1>
+
+  <div class="flex flex-col gap-3">
+    <h2 class="text-sm font-medium tracking-wide text-muted-color uppercase">
+      Upcoming
+    </h2>
+    <app-interview-sessions-table
+      [sessions]="upcoming()"
+      perspective="candidate"
+      emptyMessage="No upcoming interviews scheduled."
+    />
+  </div>
+
+  <div class="flex flex-col gap-3">
+    <h2 class="text-sm font-medium tracking-wide text-muted-color uppercase">
+      History
+    </h2>
+    <app-interview-sessions-table
+      [sessions]="history()"
+      perspective="candidate"
+      emptyMessage="No past interviews yet."
+    />
+  </div>
+</div>

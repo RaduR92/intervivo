@@ -4,7 +4,7 @@ import { catchError, map, of } from 'rxjs';
 import { AuthService, Role } from '@core/services/auth.service';
 
 function homeForRole(role: Role): string {
-  return role === 'HR' ? '/dashboard' : '/candidate-home';
+  return role === Role.HR ? '/dashboard' : '/candidate/dashboard';
 }
 
 /**
@@ -35,5 +35,5 @@ function roleGuard(allowedRole: Role): CanActivateFn {
   };
 }
 
-export const hrGuard: CanActivateFn = roleGuard('HR');
-export const candidateGuard: CanActivateFn = roleGuard('CANDIDATE');
+export const hrGuard: CanActivateFn = roleGuard(Role.HR);
+export const candidateGuard: CanActivateFn = roleGuard(Role.CANDIDATE);

@@ -38,7 +38,7 @@
   </div>
 
   <nav class="flex flex-col gap-1 px-2">
-    @for (item of navItems; track item.route) {
+    @for (item of navItems(); track item.route) {
       <a
         [routerLink]="item.route"
         routerLinkActive="bg-highlight text-color-emphasis"

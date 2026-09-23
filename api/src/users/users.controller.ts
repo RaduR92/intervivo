@@ -13,6 +13,7 @@ import {
   ApiCookieAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -21,6 +22,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ErrorResponseDto } from '@common/dto/error-response.dto.js';
+import { Roles } from '@common/decorators/roles.decorator.js';
+import { Role } from '@generated/prisma/enums.js';
+import { CurrentUser } from '@auth/decorators/current-user.decorator.js';
+import type { AuthenticatedUser } from '@auth/interfaces/jwt-payload.interface.js';
 import { CandidateResponseDto } from './dto/candidate-response.dto.js';
 import { CreateCandidateDto } from './dto/create-candidate.dto.js';
 import { ListCandidatesQueryDto } from './dto/list-candidates-query.dto.js';
@@ -37,9 +42,10 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @Roles(Role.HR)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: 'Create a candidate account',
+    summary: 'Create a candidate account (HR only)',
     description:
       'Creates the User (role CANDIDATE) and its CandidateProfile together ' +
       'in one transaction — this is the only place a CandidateProfile is ' +
@@ -48,13 +54,16 @@ export class UsersController {
   })
   @ApiCreatedResponse({ type: CandidateResponseDto })
   @ApiConflictResponse({ type: ErrorResponseDto })
+  @ApiForbiddenResponse({ type: ErrorResponseDto })
   async create(@Body() dto: CreateCandidateDto): Promise<CandidateResponseDto> {
     return this.usersService.createCandidate(dto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'List candidates' })
+  @Roles(Role.HR)
+  @ApiOperation({ summary: 'List candidates (HR only)' })
   @ApiOkResponse({ type: PaginatedCandidatesResponseDto })
+  @ApiForbiddenResponse({ type: ErrorResponseDto })
   async findAll(
     @Query() query: ListCandidatesQueryDto,
   ): Promise<PaginatedCandidatesResponseDto> {
@@ -62,21 +71,34 @@ export class UsersController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a single candidate' })
+  @ApiOperation({
+    summary: 'Get a single candidate',
+    description:
+      'HR can fetch any candidate. A CANDIDATE can only fetch themself — ' +
+      "any other id reports 404, the same as one that doesn't exist.",
+  })
   @ApiOkResponse({ type: CandidateResponseDto })
   @ApiNotFoundResponse({ type: ErrorResponseDto })
-  async findOne(@Param('id') id: string): Promise<CandidateResponseDto> {
-    return this.usersService.findCandidateById(id);
+  async findOne(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<CandidateResponseDto> {
+    return this.usersService.findCandidateById(id, user);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: "Update a candidate's profile" })
+  @ApiOperation({
+    summary: "Update a candidate's profile",
+    description:
+      'HR can update any candidate. A CANDIDATE can only update themself.',
+  })
   @ApiOkResponse({ type: CandidateResponseDto })
   @ApiNotFoundResponse({ type: ErrorResponseDto })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateCandidateDto,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<CandidateResponseDto> {
-    return this.usersService.updateCandidateProfile(id, dto);
+    return this.usersService.updateCandidateProfile(id, dto, user);
   }
 }

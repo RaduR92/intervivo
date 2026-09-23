@@ -5,7 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Button } from '@openng/optimus-ui/button';
 import { InputText } from '@openng/optimus-ui/inputtext';
 import { AuthLayout } from '@shared/components/auth-layout/auth-layout';
-import { AuthService } from '@core/services/auth.service';
+import { AuthService, Role } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -37,7 +37,7 @@ export class Login {
       next: ({ user }) => {
         this.loading.set(false);
         this.router.navigate([
-          user.role === 'HR' ? '/dashboard' : '/candidate-home',
+          user.role === Role.HR ? '/dashboard' : '/candidate/dashboard',
         ]);
       },
       error: (error: unknown) => {

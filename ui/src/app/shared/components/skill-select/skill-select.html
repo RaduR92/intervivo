@@ -1,0 +1,10 @@
+<p-multiselect
+  [options]="SKILLS"
+  [ngModel]="value()"
+  (ngModelChange)="onModelChange($event)"
+  [placeholder]="placeholder()"
+  display="chip"
+  filter
+  [showClear]="true"
+  styleClass="w-full"
+/>

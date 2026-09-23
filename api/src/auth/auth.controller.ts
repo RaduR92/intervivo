@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Req,
   Res,
@@ -35,6 +36,7 @@ import { PasswordResetRequestDto } from './dto/password-reset-request.dto.js';
 import { PasswordResetRequestResponseDto } from './dto/password-reset-request-response.dto.js';
 import { SessionResponseDto } from './dto/session-response.dto.js';
 import { SuccessResponseDto } from './dto/success-response.dto.js';
+import { UpdateMeDto } from './dto/update-me.dto.js';
 import { UserResponseDto } from './dto/user-response.dto.js';
 import type { AuthenticatedUser } from './interfaces/jwt-payload.interface.js';
 
@@ -126,6 +128,23 @@ export class AuthController {
   @ApiOkResponse({ type: UserResponseDto })
   async me(@CurrentUser() user: AuthenticatedUser): Promise<UserResponseDto> {
     return this.authService.getCurrentUser(user.id);
+  }
+
+  @Patch('me')
+  @ApiCookieAuth('access_token')
+  @ApiOperation({
+    summary: 'Update basic account info for the current user',
+    description:
+      'firstName/lastName only, for any role. Email is unchangeable here; ' +
+      'CANDIDATE-only fields (phone, skills, etc.) go through ' +
+      'PATCH /users/candidates/:id instead.',
+  })
+  @ApiOkResponse({ type: UserResponseDto })
+  async updateMe(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: UpdateMeDto,
+  ): Promise<UserResponseDto> {
+    return this.authService.updateCurrentUser(user.id, dto);
   }
 
   @Public()

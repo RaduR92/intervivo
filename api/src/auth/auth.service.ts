@@ -238,6 +238,23 @@ export class AuthService {
     };
   }
 
+  async updateCurrentUser(
+    userId: string,
+    dto: { firstName?: string; lastName?: string },
+  ): Promise<CurrentUserProfile> {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { firstName: dto.firstName, lastName: dto.lastName },
+    });
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
+  }
+
   /** Returns the raw reset token when the email matches a user, null otherwise. */
   async requestPasswordReset(email: string): Promise<string | null> {
     const user = await this.prisma.user.findUnique({ where: { email } });

@@ -23,12 +23,41 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'candidate-home',
+    path: 'candidate',
     canActivate: [candidateGuard],
     loadComponent: () =>
-      import('./features/candidate-home/candidate-home').then(
-        (m) => m.CandidateHome,
+      import('./layout/candidate-shell/candidate-shell').then(
+        (m) => m.CandidateShell,
       ),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/candidate/dashboard/dashboard').then(
+            (m) => m.CandidateDashboard,
+          ),
+      },
+      {
+        path: 'interviews',
+        loadComponent: () =>
+          import('./features/candidate/interviews/interviews').then(
+            (m) => m.CandidateInterviews,
+          ),
+      },
+      {
+        path: 'feedback',
+        loadComponent: () =>
+          import('./features/candidate/feedback/feedback').then(
+            (m) => m.CandidateFeedback,
+          ),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile').then((m) => m.Profile),
+      },
+    ],
   },
   {
     path: '',
@@ -92,6 +121,11 @@ export const routes: Routes = [
         path: 'reports',
         loadComponent: () =>
           import('./features/reports/reports').then((m) => m.Reports),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile').then((m) => m.Profile),
       },
     ],
   },

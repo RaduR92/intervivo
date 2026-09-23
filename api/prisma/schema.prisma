@@ -35,6 +35,11 @@ model User {
   refreshToken     RefreshToken?
   resetTokens      PasswordResetToken[]
   candidateProfile CandidateProfile?
+
+  candidateSessions   InterviewSession[] @relation("CandidateSessions")
+  interviewerSessions InterviewSession[] @relation("InterviewerSessions")
+  feedbackAuthored    Feedback[]         @relation("FeedbackAuthor")
+  feedbackReceived    Feedback[]         @relation("CandidateFeedback")
 }
 
 // One-to-one with User, but Postgres can't enforce "CANDIDATE role <=> profile
@@ -54,6 +59,61 @@ model CandidateProfile {
   skills          String[] @default([])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum Recommendation {
+  HIRE
+  NO_HIRE
+  MAYBE
+}
+
+model InterviewSession {
+  id              String          @id @default(uuid())
+  candidateId     String
+  candidate       User            @relation("CandidateSessions", fields: [candidateId], references: [id], onDelete: Cascade)
+  interviewerId   String
+  interviewer     User            @relation("InterviewerSessions", fields: [interviewerId], references: [id], onDelete: Cascade)
+  scheduledAt     DateTime
+  durationMinutes Int
+  position        String
+  status          InterviewStatus @default(SCHEDULED)
+  meetingLink     String?
+  notes           String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  feedback Feedback?
+
+  @@index([candidateId])
+  @@index([interviewerId])
+}
+
+// One feedback per session (sessionId is unique below), authored by the
+// interviewer. isPublished gates candidate visibility — see the Feedback
+// module's service for the enforcement (candidates never see drafts).
+model Feedback {
+  id             String           @id @default(uuid())
+  sessionId      String           @unique
+  session        InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User             @relation("FeedbackAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  candidateId    String
+  candidate      User             @relation("CandidateFeedback", fields: [candidateId], references: [id], onDelete: Cascade)
+  rating         Int?
+  recommendation Recommendation
+  comments       String
+  isPublished    Boolean          @default(false)
+  publishedAt    DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([candidateId])
 }
 
 model RefreshToken {

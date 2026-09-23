@@ -1,0 +1,162 @@
+<div class="flex flex-col gap-6">
+  <h1 class="text-2xl font-semibold text-color">My Profile</h1>
+
+  <form
+    class="flex max-w-lg flex-col gap-4 rounded-border border border-surface bg-[var(--p-content-background)] p-4"
+    (ngSubmit)="saveBasicInfo()"
+  >
+    <h2 class="text-sm font-medium tracking-wide text-muted-color uppercase">
+      Basic info
+    </h2>
+
+    <div class="flex flex-col gap-1">
+      <label for="email" class="text-sm text-color">Email</label>
+      <input
+        id="email"
+        type="email"
+        pInputText
+        class="w-full"
+        [value]="auth.currentUser()?.email"
+        disabled
+      />
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-1">
+        <label for="firstName" class="text-sm text-color">First name</label>
+        <input
+          id="firstName"
+          type="text"
+          pInputText
+          class="w-full"
+          [ngModel]="firstName()"
+          (ngModelChange)="firstName.set($event)"
+          name="firstName"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="lastName" class="text-sm text-color">Last name</label>
+        <input
+          id="lastName"
+          type="text"
+          pInputText
+          class="w-full"
+          [ngModel]="lastName()"
+          (ngModelChange)="lastName.set($event)"
+          name="lastName"
+        />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <p-button type="submit" label="Save" [loading]="savingBasicInfo()" />
+      @if (basicInfoMessage()) {
+        <span class="text-sm text-muted-color">{{ basicInfoMessage() }}</span>
+      }
+    </div>
+  </form>
+
+  @if (isCandidate()) {
+    <form
+      class="flex max-w-lg flex-col gap-4 rounded-border border border-surface bg-[var(--p-content-background)] p-4"
+      (ngSubmit)="saveCandidateProfile()"
+    >
+      <h2 class="text-sm font-medium tracking-wide text-muted-color uppercase">
+        Candidate details
+      </h2>
+
+      <div class="flex flex-col gap-1">
+        <label for="phone" class="text-sm text-color">Phone</label>
+        <input
+          id="phone"
+          type="text"
+          pInputText
+          class="w-full"
+          [ngModel]="phone()"
+          (ngModelChange)="phone.set($event)"
+          name="phone"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="flex flex-col gap-1">
+          <label for="currentRole" class="text-sm text-color">Current role</label>
+          <input
+            id="currentRole"
+            type="text"
+            pInputText
+            class="w-full"
+            [ngModel]="currentRole()"
+            (ngModelChange)="currentRole.set($event)"
+            name="currentRole"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label for="targetRole" class="text-sm text-color">Target role</label>
+          <input
+            id="targetRole"
+            type="text"
+            pInputText
+            class="w-full"
+            [ngModel]="targetRole()"
+            (ngModelChange)="targetRole.set($event)"
+            name="targetRole"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="yearsExperience" class="text-sm text-color">Years of experience</label>
+        <p-inputNumber
+          inputId="yearsExperience"
+          [min]="0"
+          [ngModel]="yearsExperience()"
+          (ngModelChange)="yearsExperience.set($event)"
+          name="yearsExperience"
+          styleClass="w-full"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="resumeUrl" class="text-sm text-color">Resume URL</label>
+        <input
+          id="resumeUrl"
+          type="url"
+          pInputText
+          class="w-full"
+          [ngModel]="resumeUrl()"
+          (ngModelChange)="resumeUrl.set($event)"
+          name="resumeUrl"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <span class="text-sm text-color">Skills</span>
+        <app-skill-select
+          [value]="skills()"
+          (valueChange)="skills.set($event)"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="notes" class="text-sm text-color">Notes</label>
+        <textarea
+          id="notes"
+          pTextarea
+          rows="3"
+          class="w-full"
+          [ngModel]="notes()"
+          (ngModelChange)="notes.set($event)"
+          name="notes"
+        ></textarea>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <p-button type="submit" label="Save" [loading]="savingProfile()" />
+        @if (profileMessage()) {
+          <span class="text-sm text-muted-color">{{ profileMessage() }}</span>
+        }
+      </div>
+    </form>
+  }
+</div>
