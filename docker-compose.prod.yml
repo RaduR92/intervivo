@@ -1,0 +1,77 @@
+# Production stack for intervivo.rr-dev.ro / api-intervivo.rr-dev.ro, sharing
+# the VPS with dentmap/dentsync. `proxy` is a pre-existing, VPS-wide external
+# network (created by Nginx Proxy Manager, not by this file) that NPM and every
+# hosted app's containers join so NPM can reach them.
+#
+# Must always be run with an explicit project name so `--remove-orphans` can
+# never see or delete another app's containers on this VPS:
+#   docker compose -p intervivo -f docker-compose.prod.yml --env-file .env.prod up -d --remove-orphans
+services:
+  api:
+    image: ghcr.io/${GITHUB_REPO}/intervivo-api:${IMAGE_TAG}
+    container_name: intervivo_api
+    restart: unless-stopped
+    env_file: .env.prod
+    networks:
+      - proxy
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  ui:
+    image: ghcr.io/${GITHUB_REPO}/intervivo-ui:${IMAGE_TAG}
+    container_name: intervivo_ui
+    restart: unless-stopped
+    networks:
+      - proxy
+
+  postgres:
+    image: postgres:18-alpine
+    container_name: intervivo_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8-alpine
+    container_name: intervivo_redis
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  proxy:
+    external: true
+  internal:
+
+volumes:
+  postgres_data:
+  redis_data:
