@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
 
+# Ensures an older run in flight (e.g. from a rapid follow-up push) can never
+# finish its deploy step after a newer one — the newer push cancels it.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
 jobs:
   check-api:
     runs-on: ubuntu-latest
@@ -69,14 +75,22 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha,prefix=${{ github.ref_name }}-
+      # No cache-from/cache-to: type=gha here. This Dockerfile mixes prisma
+      # generate + tsc's own incremental build state inside the same layer,
+      # and a stale/reused GHA cache layer has twice produced a runner image
+      # with a corrupted import (dist/generated/prisma/client.js importing a
+      # ".ts" path instead of ".js") that crash-loops in production — even
+      # after the underlying source fix (untracking tsconfig.build.tsbuildinfo)
+      # was committed and this exact stage's inputs hadn't changed. A fully
+      # uncached build is the only way we've reliably reproduced a correct
+      # image; the extra build time is worth it until this is root-caused.
       - uses: docker/build-push-action@v6
         with:
           context: ./api
           file: ./api/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
 
   build-ui:
     needs: check-ui
