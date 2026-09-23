@@ -1,11 +1,28 @@
 <div class="flex flex-col gap-4">
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <h1 class="text-2xl font-semibold text-color">Candidates</h1>
-    <p-button
-      label="Add Candidate"
-      icon="pi pi-plus"
-      (onClick)="openAddDialog()"
-    />
+    <p-button label="Add Candidate" icon="pi pi-plus" (onClick)="openAddDialog()" />
+  </div>
+
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div class="relative flex-1">
+      <i
+        class="pi pi-search pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-color"
+      ></i>
+      <input
+        type="text"
+        pInputText
+        class="w-full"
+        style="padding-left: 2.5rem"
+        placeholder="Search candidates..."
+        [ngModel]="search()"
+        (ngModelChange)="onSearchInput($event)"
+        name="search"
+      />
+    </div>
+    <p class="shrink-0 text-sm text-muted-color sm:text-right">
+      {{ candidates().length }} candidate{{ candidates().length === 1 ? '' : 's' }}
+    </p>
   </div>
 
   <div class="overflow-x-auto">
@@ -20,22 +37,55 @@
         <tr>
           <th>Name</th>
           <th>Email</th>
-          <th>Position</th>
-          <th>Status</th>
+          <th>Current Role</th>
+          <th>Experience</th>
+          <th>Skills</th>
+          <th>Joined</th>
+          <th class="text-right">Actions</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-candidate>
         <tr class="cursor-pointer" (click)="openDetail(candidate.id)">
-          <td>{{ candidate.name }}</td>
+          <td class="text-color">{{ candidate.firstName }} {{ candidate.lastName }}</td>
           <td>{{ candidate.email }}</td>
-          <td>{{ candidate.position }}</td>
-          <td>{{ candidate.status }}</td>
+          <td>{{ candidate.profile.currentRole || '—' }}</td>
+          <td>
+            @if (candidate.profile.yearsExperience) {
+              {{ candidate.profile.yearsExperience }}y
+            } @else {
+              —
+            }
+          </td>
+          <td>
+            <div class="flex flex-wrap gap-1">
+              @for (skill of candidate.profile.skills.slice(0, 3); track skill) {
+                <span class="rounded-full bg-surface px-2 py-1 text-xs font-medium text-muted-color">
+                  {{ skill }}
+                </span>
+              }
+              @if (candidate.profile.skills.length > 3) {
+                <span class="rounded-full bg-surface px-2 py-1 text-xs font-medium text-muted-color">
+                  +{{ candidate.profile.skills.length - 3 }}
+                </span>
+              }
+            </div>
+          </td>
+          <td>{{ candidate.createdAt | date: 'mediumDate' }}</td>
+          <td class="text-right">
+            <p-button
+              label="View"
+              severity="secondary"
+              text
+              size="small"
+              (onClick)="openDetail(candidate.id); $event.stopPropagation()"
+            />
+          </td>
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="4" class="py-6 text-center text-muted-color">
-            No candidates yet.
+          <td colspan="7" class="py-6 text-center text-muted-color">
+            No candidates match your search.
           </td>
         </tr>
       </ng-template>

@@ -11,6 +11,14 @@ export class ListFeedbackQueryDto {
   @IsUUID()
   candidateId?: string;
 
+  @ApiPropertyOptional({
+    description: 'Filter to one interview session — e.g. all feedback entries on a session.',
+    example: 'b1f2c3d4-5e6f-7890-abcd-ef1234567890',
+  })
+  @IsOptional()
+  @IsUUID()
+  sessionId?: string;
+
   @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })
   @IsOptional()
   @Type(() => Number)

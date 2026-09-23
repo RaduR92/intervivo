@@ -54,6 +54,7 @@ export interface UpdateCandidateProfilePayload {
 }
 
 export interface ListCandidatesParams {
+  search?: string;
   take?: number;
   skip?: number;
 }
@@ -70,6 +71,7 @@ export class CandidatesService {
 
   list(params: ListCandidatesParams = {}): Observable<PaginatedCandidates> {
     let httpParams = new HttpParams();
+    if (params.search) httpParams = httpParams.set('search', params.search);
     if (params.take !== undefined) httpParams = httpParams.set('take', params.take);
     if (params.skip !== undefined) httpParams = httpParams.set('skip', params.skip);
 

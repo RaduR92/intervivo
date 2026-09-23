@@ -1,16 +1,42 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsUUID, Max, Min } from 'class-validator';
+import { IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+import { InterviewStatus, InterviewType } from '@generated/prisma/enums.js';
+
+const STATUS_VALUES = Object.values(InterviewStatus);
+const TYPE_VALUES = Object.values(InterviewType);
 
 export class ListInterviewSessionsQueryDto {
   @ApiPropertyOptional({
     enum: ['upcoming', 'history'],
     description:
-      'upcoming = SCHEDULED sessions; history = COMPLETED/CANCELLED. Omit for all.',
+      'upcoming = SCHEDULED sessions; history = COMPLETED/CANCELLED. Omit for all. ' +
+      'Ignored when status is given.',
   })
   @IsOptional()
   @IsIn(['upcoming', 'history'])
   section?: 'upcoming' | 'history';
+
+  @ApiPropertyOptional({
+    enum: STATUS_VALUES,
+    description: 'Filter to one exact status. Takes precedence over section.',
+  })
+  @IsOptional()
+  @IsIn(STATUS_VALUES)
+  status?: InterviewStatus;
+
+  @ApiPropertyOptional({ enum: TYPE_VALUES })
+  @IsOptional()
+  @IsIn(TYPE_VALUES)
+  type?: InterviewType;
+
+  @ApiPropertyOptional({
+    description: 'Case-insensitive match against candidate name or position.',
+    example: 'senior',
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
 
   @ApiPropertyOptional({
     description: 'HR only — filter to one candidate. Ignored for CANDIDATE callers (always forced to themself).',

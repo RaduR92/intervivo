@@ -9,6 +9,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideOptimus } from '@openng/optimus-ui/config';
 import Aura from '@openng/optimus-ui-themes/aura';
+import { MessageService } from '@openng/optimus-ui/api';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
@@ -20,5 +21,6 @@ export const appConfig: ApplicationConfig = {
     provideOptimus({
       theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } },
     }),
+    MessageService,
   ],
 };

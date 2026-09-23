@@ -7,10 +7,153 @@
   [breakpoints]="{ '640px': '90vw' }"
   (onHide)="close()"
 >
-  <p class="text-muted-color">Candidate form goes here.</p>
+  <form class="flex flex-col gap-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-1">
+        <label for="firstName" class="text-sm text-color">First name</label>
+        <input
+          id="firstName"
+          type="text"
+          pInputText
+          class="w-full"
+          [ngModel]="firstName()"
+          (ngModelChange)="firstName.set($event)"
+          name="firstName"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="lastName" class="text-sm text-color">Last name</label>
+        <input
+          id="lastName"
+          type="text"
+          pInputText
+          class="w-full"
+          [ngModel]="lastName()"
+          (ngModelChange)="lastName.set($event)"
+          name="lastName"
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="email" class="text-sm text-color">Email</label>
+      <input
+        id="email"
+        type="email"
+        pInputText
+        class="w-full"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+        name="email"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="password" class="text-sm text-color">Temporary password</label>
+      <input
+        id="password"
+        type="password"
+        pInputText
+        class="w-full"
+        placeholder="At least 8 characters"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event)"
+        name="password"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-1">
+        <label for="currentRole" class="text-sm text-color">Current role</label>
+        <input
+          id="currentRole"
+          type="text"
+          pInputText
+          class="w-full"
+          [ngModel]="currentRole()"
+          (ngModelChange)="currentRole.set($event)"
+          name="currentRole"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="targetRole" class="text-sm text-color">Target role</label>
+        <input
+          id="targetRole"
+          type="text"
+          pInputText
+          class="w-full"
+          [ngModel]="targetRole()"
+          (ngModelChange)="targetRole.set($event)"
+          name="targetRole"
+        />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-1">
+        <label for="phone" class="text-sm text-color">Phone</label>
+        <input
+          id="phone"
+          type="text"
+          pInputText
+          class="w-full"
+          [ngModel]="phone()"
+          (ngModelChange)="phone.set($event)"
+          name="phone"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="yearsExperience" class="text-sm text-color">Years of experience</label>
+        <p-inputNumber
+          inputId="yearsExperience"
+          [min]="0"
+          [ngModel]="yearsExperience()"
+          (ngModelChange)="yearsExperience.set($event)"
+          name="yearsExperience"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="resumeUrl" class="text-sm text-color">Resume URL</label>
+      <input
+        id="resumeUrl"
+        type="url"
+        pInputText
+        class="w-full"
+        [ngModel]="resumeUrl()"
+        (ngModelChange)="resumeUrl.set($event)"
+        name="resumeUrl"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <span class="text-sm text-color">Skills</span>
+      <app-skill-select [value]="skills()" (valueChange)="skills.set($event)" />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="notes" class="text-sm text-color">Notes</label>
+      <textarea
+        id="notes"
+        pTextarea
+        rows="3"
+        class="w-full"
+        [ngModel]="notes()"
+        (ngModelChange)="notes.set($event)"
+        name="notes"
+      ></textarea>
+    </div>
+  </form>
 
   <ng-template pTemplate="footer">
     <p-button label="Cancel" severity="secondary" text (onClick)="close()" />
-    <p-button label="Save" (onClick)="close()" />
+    <p-button
+      label="Save"
+      [disabled]="!canSubmit"
+      [loading]="saving()"
+      (onClick)="save()"
+    />
   </ng-template>
 </p-dialog>

@@ -26,6 +26,7 @@ function toResponse(session: SessionWithPeople): InterviewSessionResponseDto {
     scheduledAt: session.scheduledAt,
     durationMinutes: session.durationMinutes,
     position: session.position,
+    type: session.type,
     status: session.status,
     meetingLink: session.meetingLink,
     notes: session.notes,
@@ -64,6 +65,7 @@ export class InterviewsService {
         scheduledAt: new Date(dto.scheduledAt),
         durationMinutes: dto.durationMinutes,
         position: dto.position,
+        type: dto.type,
         meetingLink: dto.meetingLink,
         notes: dto.notes,
       },
@@ -79,14 +81,41 @@ export class InterviewsService {
   ): Promise<PaginatedInterviewSessionsResponseDto> {
     const candidateId = requester.role === Role.CANDIDATE ? requester.id : query.candidateId;
 
-    const statusFilter: { status?: InterviewStatus | { in: InterviewStatus[] } } =
-      query.section === 'upcoming'
+    // An exact status wins over the upcoming/history grouping if both are given.
+    const statusFilter: { status?: InterviewStatus | { in: InterviewStatus[] } } = query.status
+      ? { status: query.status }
+      : query.section === 'upcoming'
         ? { status: InterviewStatus.SCHEDULED }
         : query.section === 'history'
           ? { status: { in: [InterviewStatus.COMPLETED, InterviewStatus.CANCELLED] } }
           : {};
 
-    const where = { ...(candidateId ? { candidateId } : {}), ...statusFilter };
+    const typeFilter = query.type ? { type: query.type } : {};
+
+    const searchFilter = query.search
+      ? {
+          OR: [
+            { position: { contains: query.search, mode: 'insensitive' as const } },
+            {
+              candidate: {
+                firstName: { contains: query.search, mode: 'insensitive' as const },
+              },
+            },
+            {
+              candidate: {
+                lastName: { contains: query.search, mode: 'insensitive' as const },
+              },
+            },
+          ],
+        }
+      : {};
+
+    const where = {
+      ...(candidateId ? { candidateId } : {}),
+      ...statusFilter,
+      ...typeFilter,
+      ...searchFilter,
+    };
 
     const [sessions, total] = await this.prisma.$transaction([
       this.prisma.interviewSession.findMany({
@@ -148,6 +177,7 @@ export class InterviewsService {
         scheduledAt: dto.scheduledAt ? new Date(dto.scheduledAt) : undefined,
         durationMinutes: dto.durationMinutes,
         position: dto.position,
+        type: dto.type,
         status: dto.status,
         meetingLink: dto.meetingLink,
         notes: dto.notes,

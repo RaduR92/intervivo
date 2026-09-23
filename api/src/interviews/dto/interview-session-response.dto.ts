@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { InterviewStatus } from '@generated/prisma/enums.js';
+import { InterviewStatus, InterviewType } from '@generated/prisma/enums.js';
 import { PersonSummaryDto } from '@common/dto/person-summary.dto.js';
 
 export class InterviewSessionResponseDto {
@@ -20,6 +20,9 @@ export class InterviewSessionResponseDto {
 
   @ApiProperty({ example: 'Senior Software Engineer' })
   position!: string;
+
+  @ApiProperty({ enum: InterviewType, example: InterviewType.TECHNICAL })
+  type!: InterviewType;
 
   @ApiProperty({ enum: InterviewStatus, example: InterviewStatus.SCHEDULED })
   status!: InterviewStatus;

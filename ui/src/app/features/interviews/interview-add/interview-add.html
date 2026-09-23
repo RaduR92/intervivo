@@ -7,10 +7,114 @@
   [breakpoints]="{ '640px': '90vw' }"
   (onHide)="close()"
 >
-  <p class="text-muted-color">Interview form goes here.</p>
+  <form class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1">
+      <label for="candidate" class="text-sm text-color">Candidate</label>
+      <p-select
+        inputId="candidate"
+        [options]="candidateOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="candidateId()"
+        (ngModelChange)="candidateId.set($event)"
+        name="candidate"
+        placeholder="Select a candidate"
+        [loading]="loadingCandidates()"
+        filter
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="position" class="text-sm text-color">Position</label>
+      <input
+        id="position"
+        type="text"
+        pInputText
+        class="w-full"
+        placeholder="Senior Software Engineer"
+        [ngModel]="position()"
+        (ngModelChange)="position.set($event)"
+        name="position"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="type" class="text-sm text-color">Type</label>
+      <p-select
+        inputId="type"
+        [options]="typeOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="type()"
+        (ngModelChange)="type.set($event)"
+        name="type"
+        placeholder="Select a type"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-1">
+        <label for="scheduledAt" class="text-sm text-color">Date &amp; time</label>
+        <p-datePicker
+          inputId="scheduledAt"
+          [showTime]="true"
+          [ngModel]="scheduledAt()"
+          (ngModelChange)="scheduledAt.set($event)"
+          name="scheduledAt"
+          styleClass="w-full"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="duration" class="text-sm text-color">Duration (minutes)</label>
+        <p-inputNumber
+          inputId="duration"
+          [min]="15"
+          [max]="480"
+          [ngModel]="durationMinutes()"
+          (ngModelChange)="durationMinutes.set($event)"
+          name="duration"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="meetingLink" class="text-sm text-color">Meeting link (optional)</label>
+      <input
+        id="meetingLink"
+        type="url"
+        pInputText
+        class="w-full"
+        placeholder="https://meet.example.com/abc"
+        [ngModel]="meetingLink()"
+        (ngModelChange)="meetingLink.set($event)"
+        name="meetingLink"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="notes" class="text-sm text-color">Notes (optional)</label>
+      <textarea
+        id="notes"
+        pTextarea
+        rows="3"
+        class="w-full"
+        [ngModel]="notes()"
+        (ngModelChange)="notes.set($event)"
+        name="notes"
+      ></textarea>
+    </div>
+  </form>
 
   <ng-template pTemplate="footer">
     <p-button label="Cancel" severity="secondary" text (onClick)="close()" />
-    <p-button label="Save" (onClick)="close()" />
+    <p-button
+      label="Save"
+      [disabled]="!canSubmit"
+      [loading]="saving()"
+      (onClick)="save()"
+    />
   </ng-template>
 </p-dialog>

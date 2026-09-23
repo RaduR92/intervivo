@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-6">
   <div class="flex items-center gap-3">
     <p-button
       icon="pi pi-arrow-left"
@@ -10,5 +10,294 @@
     />
     <h1 class="text-2xl font-semibold text-color">Interview Detail</h1>
   </div>
-  <p class="text-muted-color">Interview ID: {{ id }}</p>
+
+  @if (session(); as s) {
+    <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <p class="text-xs font-medium tracking-wide text-muted-color uppercase">Candidate</p>
+          <p class="mt-1 text-color">{{ s.candidate.firstName }} {{ s.candidate.lastName }}</p>
+          <p class="text-sm text-muted-color">{{ s.candidate.email }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-medium tracking-wide text-muted-color uppercase">Interviewer</p>
+          <p class="mt-1 text-color">{{ s.interviewer.firstName }} {{ s.interviewer.lastName }}</p>
+          <p class="text-sm text-muted-color">{{ s.interviewer.email }}</p>
+        </div>
+      </div>
+    </div>
+
+    <form class="flex flex-col gap-4 rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+      <h2 class="text-sm font-medium tracking-wide text-muted-color uppercase">Session details</h2>
+
+      <div class="flex flex-col gap-1">
+        <label for="position" class="text-sm text-color">Position</label>
+        <input
+          id="position"
+          type="text"
+          pInputText
+          class="w-full"
+          [ngModel]="position()"
+          (ngModelChange)="position.set($event)"
+          name="position"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="flex flex-col gap-1">
+          <label for="scheduledAt" class="text-sm text-color">Date &amp; time</label>
+          <p-datePicker
+            inputId="scheduledAt"
+            [showTime]="true"
+            [ngModel]="scheduledAt()"
+            (ngModelChange)="scheduledAt.set($event)"
+            name="scheduledAt"
+            styleClass="w-full"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label for="duration" class="text-sm text-color">Duration (minutes)</label>
+          <p-inputNumber
+            inputId="duration"
+            [min]="15"
+            [max]="480"
+            [ngModel]="durationMinutes()"
+            (ngModelChange)="durationMinutes.set($event)"
+            name="duration"
+            styleClass="w-full"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="flex flex-col gap-1">
+          <label for="type" class="text-sm text-color">Type</label>
+          <p-select
+            inputId="type"
+            [options]="typeOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="type()"
+            (ngModelChange)="type.set($event)"
+            name="type"
+            styleClass="w-full"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label for="status" class="text-sm text-color">Status</label>
+          <p-select
+            inputId="status"
+            [options]="statusOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="status()"
+            (ngModelChange)="status.set($event)"
+            name="status"
+            styleClass="w-full"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="meetingLink" class="text-sm text-color">Meeting link</label>
+        <input
+          id="meetingLink"
+          type="url"
+          pInputText
+          class="w-full"
+          [ngModel]="meetingLink()"
+          (ngModelChange)="meetingLink.set($event)"
+          name="meetingLink"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="notes" class="text-sm text-color">Notes</label>
+        <textarea
+          id="notes"
+          pTextarea
+          rows="3"
+          class="w-full"
+          [ngModel]="notes()"
+          (ngModelChange)="notes.set($event)"
+          name="notes"
+        ></textarea>
+      </div>
+
+      <div>
+        <p-button
+          label="Save changes"
+          [disabled]="!canSaveSession"
+          [loading]="saving()"
+          (onClick)="saveSession()"
+        />
+      </div>
+    </form>
+  } @else if (!loading()) {
+    <p class="text-muted-color">Interview not found.</p>
+  }
+
+  <div class="flex flex-col gap-3">
+    <div class="flex items-center justify-between">
+      <h2 class="text-sm font-medium tracking-wide text-muted-color uppercase">Feedback</h2>
+      @if (session()) {
+        <p-button
+          [label]="myFeedback() ? 'Edit your feedback' : 'Add your feedback'"
+          icon="pi pi-comment"
+          size="small"
+          (onClick)="openFeedbackDialog()"
+        />
+      }
+    </div>
+
+    @if (!loadingFeedback() && feedbackItems().length === 0) {
+      <p class="text-sm text-muted-color">No feedback has been left on this session yet.</p>
+    }
+
+    @for (item of feedbackItems(); track item.id) {
+      <div class="flex flex-col gap-2 rounded-border border border-surface bg-[var(--p-content-background)] p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="font-medium text-color">
+            {{ item.author.firstName }} {{ item.author.lastName }}
+          </p>
+          <div class="flex items-center gap-2">
+            @if (!item.isPublished) {
+              <span class="rounded-full bg-surface px-2 py-1 text-xs font-medium text-muted-color"
+                >Draft</span
+              >
+            }
+            <span
+              class="rounded-full px-2 py-1 text-xs font-medium"
+              [class.bg-green-100]="item.recommendation === Recommendation.HIRE"
+              [class.text-green-700]="item.recommendation === Recommendation.HIRE"
+              [class.bg-amber-100]="item.recommendation === Recommendation.MAYBE"
+              [class.text-amber-700]="item.recommendation === Recommendation.MAYBE"
+              [class.bg-red-100]="item.recommendation === Recommendation.NO_HIRE"
+              [class.text-red-700]="item.recommendation === Recommendation.NO_HIRE"
+            >
+              {{ recommendationLabels[item.recommendation] }}
+            </span>
+          </div>
+        </div>
+        @if (item.rating) {
+          <p class="text-sm text-muted-color">Rating: {{ item.rating }} / 10</p>
+        }
+        <p class="text-sm text-color">{{ item.comments }}</p>
+        @if (item.strengths) {
+          <p class="text-sm text-color">
+            <span class="font-medium text-muted-color">Strengths:</span> {{ item.strengths }}
+          </p>
+        }
+        @if (item.improvementAreas) {
+          <p class="text-sm text-color">
+            <span class="font-medium text-muted-color">Areas for improvement:</span>
+            {{ item.improvementAreas }}
+          </p>
+        }
+        <p class="text-xs text-muted-color">{{ item.createdAt | date: 'medium' }}</p>
+      </div>
+    }
+  </div>
 </div>
+
+<p-dialog
+  header="Your feedback"
+  [visible]="feedbackDialogOpen()"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '32rem' }"
+  [breakpoints]="{ '640px': '90vw' }"
+  (onHide)="closeFeedbackDialog()"
+>
+  <form class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1">
+      <label for="recommendation" class="text-sm text-color">Recommendation</label>
+      <p-select
+        inputId="recommendation"
+        [options]="recommendationOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="feedbackRecommendation()"
+        (ngModelChange)="feedbackRecommendation.set($event)"
+        name="recommendation"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="rating" class="text-sm text-color">Rating (optional)</label>
+      <p-inputNumber
+        inputId="rating"
+        [min]="1"
+        [max]="10"
+        [ngModel]="feedbackRating()"
+        (ngModelChange)="feedbackRating.set($event)"
+        name="rating"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="comments" class="text-sm text-color">Comments</label>
+      <textarea
+        id="comments"
+        pTextarea
+        rows="4"
+        class="w-full"
+        [ngModel]="feedbackComments()"
+        (ngModelChange)="feedbackComments.set($event)"
+        name="comments"
+      ></textarea>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="strengths" class="text-sm text-color">Strengths (optional)</label>
+      <textarea
+        id="strengths"
+        pTextarea
+        rows="2"
+        class="w-full"
+        placeholder="What stood out positively?"
+        [ngModel]="feedbackStrengths()"
+        (ngModelChange)="feedbackStrengths.set($event)"
+        name="strengths"
+      ></textarea>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="improvementAreas" class="text-sm text-color">Areas for improvement (optional)</label>
+      <textarea
+        id="improvementAreas"
+        pTextarea
+        rows="2"
+        class="w-full"
+        placeholder="What could they work on?"
+        [ngModel]="feedbackImprovementAreas()"
+        (ngModelChange)="feedbackImprovementAreas.set($event)"
+        name="improvementAreas"
+      ></textarea>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <p-toggleSwitch
+        inputId="published"
+        [ngModel]="feedbackPublished()"
+        (ngModelChange)="feedbackPublished.set($event)"
+        name="published"
+      />
+      <label for="published" class="text-sm text-color"
+        >Visible to the candidate</label
+      >
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" severity="secondary" text (onClick)="closeFeedbackDialog()" />
+    <p-button
+      label="Save"
+      [disabled]="!canSubmitFeedback"
+      [loading]="savingFeedback()"
+      (onClick)="saveFeedback()"
+    />
+  </ng-template>
+</p-dialog>

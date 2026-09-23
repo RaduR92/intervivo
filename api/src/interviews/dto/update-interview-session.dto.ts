@@ -10,9 +10,10 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { InterviewStatus } from '@generated/prisma/enums.js';
+import { InterviewStatus, InterviewType } from '@generated/prisma/enums.js';
 
 const STATUS_VALUES = Object.values(InterviewStatus);
+const TYPE_VALUES = Object.values(InterviewType);
 
 export class UpdateInterviewSessionDto {
   @ApiPropertyOptional({ example: '20259ae5-746b-44d4-a3d0-c2d9aa3523ed' })
@@ -36,6 +37,11 @@ export class UpdateInterviewSessionDto {
   @IsOptional()
   @IsString()
   position?: string;
+
+  @ApiPropertyOptional({ enum: TYPE_VALUES, example: InterviewType.TECHNICAL })
+  @IsOptional()
+  @IsIn(TYPE_VALUES)
+  type?: InterviewType;
 
   @ApiPropertyOptional({ enum: STATUS_VALUES, example: InterviewStatus.COMPLETED })
   @IsOptional()

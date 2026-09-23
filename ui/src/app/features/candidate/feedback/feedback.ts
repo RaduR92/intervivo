@@ -1,6 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { FeedbackService, Feedback } from '@core/services/feedback.service';
+import {
+  FeedbackService,
+  Feedback,
+  Recommendation,
+  RECOMMENDATION_LABELS,
+} from '@core/services/feedback.service';
 
 @Component({
   selector: 'app-candidate-feedback',
@@ -8,6 +13,9 @@ import { FeedbackService, Feedback } from '@core/services/feedback.service';
   templateUrl: './feedback.html',
 })
 export class CandidateFeedback implements OnInit {
+  protected readonly Recommendation = Recommendation;
+  protected readonly recommendationLabels = RECOMMENDATION_LABELS;
+
   private readonly feedbackService = inject(FeedbackService);
 
   protected readonly loading = signal(true);

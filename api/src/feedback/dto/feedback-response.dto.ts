@@ -22,6 +22,20 @@ export class FeedbackResponseDto {
   @ApiProperty({ example: 'Strong problem-solving, clear communication.' })
   comments!: string;
 
+  @ApiProperty({
+    required: false,
+    nullable: true,
+    example: 'Deep systems knowledge, calm under pressure.',
+  })
+  strengths!: string | null;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+    example: 'Could be more concise when explaining trade-offs.',
+  })
+  improvementAreas!: string | null;
+
   @ApiProperty({ example: true })
   isPublished!: boolean;
 
