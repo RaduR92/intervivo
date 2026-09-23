@@ -24,6 +24,7 @@
       "@db/*": ["./src/prisma/*"],
       "@redis/*": ["./src/redis/*"],
       "@health/*": ["./src/health/*"],
+      "@users/*": ["./src/users/*"],
       "@generated/*": ["./src/generated/*"]
     }
   }

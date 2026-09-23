@@ -10,11 +10,20 @@ import {
 } from './auth.constants.js';
 import { generateOpaqueToken, hashOpaqueToken } from './token.util.js';
 import type { AuthenticatedUser } from './interfaces/jwt-payload.interface.js';
+import type { Role } from '@generated/prisma/enums.js';
 
 interface IssuedTokens {
   accessToken: string;
   refreshToken: string;
   user: AuthenticatedUser;
+}
+
+interface CurrentUserProfile {
+  id: string;
+  email: string;
+  role: Role;
+  firstName: string;
+  lastName: string;
 }
 
 function refreshTokenExpiry(): Date {
@@ -54,11 +63,16 @@ export class AuthService {
       },
     });
 
-    const authUser: AuthenticatedUser = { id: user.id, email: user.email };
+    const authUser: AuthenticatedUser = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
     return {
       accessToken: await this.jwtService.signAsync({
         sub: user.id,
         email: user.email,
+        role: user.role,
       }),
       refreshToken: rawRefreshToken,
       user: authUser,
@@ -148,13 +162,18 @@ export class AuthService {
         const user = await tx.user.findUniqueOrThrow({
           where: { id: row.userId },
         });
-        const authUser: AuthenticatedUser = { id: user.id, email: user.email };
+        const authUser: AuthenticatedUser = {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        };
 
         return {
           kind: 'success',
           accessToken: await this.jwtService.signAsync({
             sub: user.id,
             email: user.email,
+            role: user.role,
           }),
           refreshToken: rawRefreshToken,
           user: authUser,
@@ -201,7 +220,7 @@ export class AuthService {
     });
   }
 
-  async getCurrentUser(userId: string): Promise<AuthenticatedUser> {
+  async getCurrentUser(userId: string): Promise<CurrentUserProfile> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new AppException(
@@ -210,7 +229,13 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    return { id: user.id, email: user.email };
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
   }
 
   /** Returns the raw reset token when the email matches a user, null otherwise. */

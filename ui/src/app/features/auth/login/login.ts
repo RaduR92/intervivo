@@ -34,9 +34,11 @@ export class Login {
     this.loading.set(true);
 
     this.authService.login(this.email(), this.password()).subscribe({
-      next: () => {
+      next: ({ user }) => {
         this.loading.set(false);
-        this.router.navigate(['/dashboard']);
+        this.router.navigate([
+          user.role === 'HR' ? '/dashboard' : '/candidate-home',
+        ]);
       },
       error: (error: unknown) => {
         this.loading.set(false);

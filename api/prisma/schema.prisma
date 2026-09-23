@@ -17,15 +17,43 @@ model HealthCheck {
   createdAt DateTime @default(now())
 }
 
+enum Role {
+  HR
+  CANDIDATE
+}
+
 model User {
   id           String    @id @default(uuid())
   email        String    @unique
   passwordHash String
+  role         Role
+  firstName    String
+  lastName     String
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  refreshToken RefreshToken?
-  resetTokens  PasswordResetToken[]
+  refreshToken     RefreshToken?
+  resetTokens      PasswordResetToken[]
+  candidateProfile CandidateProfile?
+}
+
+// One-to-one with User, but Postgres can't enforce "CANDIDATE role <=> profile
+// exists" as a schema constraint without a trigger — that invariant is
+// enforced where the row is created (UsersService.createCandidate's
+// transaction), not here. See api/README.md.
+model CandidateProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone           String?
+  currentRole     String?
+  yearsExperience Int?
+  targetRole      String?
+  resumeUrl       String?
+  notes           String?
+  skills          String[] @default([])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model RefreshToken {
