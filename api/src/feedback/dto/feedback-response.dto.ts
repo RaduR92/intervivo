@@ -13,6 +13,9 @@ export class FeedbackResponseDto {
   @ApiProperty({ type: PersonSummaryDto })
   author!: PersonSummaryDto;
 
+  @ApiProperty({ type: PersonSummaryDto })
+  candidate!: PersonSummaryDto;
+
   @ApiProperty({ required: false, nullable: true, example: 4 })
   rating!: number | null;
 

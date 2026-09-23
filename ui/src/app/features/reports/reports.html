@@ -2,7 +2,7 @@
   <h1 class="text-2xl font-semibold text-color">Reports</h1>
 
   <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-    @for (stat of stats; track stat.label) {
+    @for (stat of stats(); track stat.label) {
       <div class="rounded-border border border-surface bg-[var(--p-content-background)] p-4">
         <p class="text-xs font-medium tracking-wide text-muted-color uppercase">
           {{ stat.label }}
@@ -24,7 +24,7 @@
       <p-chart
         type="bar"
         class="relative mt-4 block h-72"
-        [data]="sessionVolumeData"
+        [data]="sessionVolumeData()"
         [options]="sessionVolumeOptions"
       />
     </div>
@@ -39,11 +39,11 @@
           width="176"
           height="176"
           class="relative block h-44 w-44 overflow-hidden"
-          [data]="outcomeData"
+          [data]="outcomeData()"
           [options]="outcomeOptions"
         />
         <ul class="flex w-full flex-col gap-2 text-sm">
-          @for (item of outcomes; track item.label) {
+          @for (item of outcomes(); track item.label) {
             <li class="flex items-center justify-between gap-6">
               <span class="flex items-center gap-2 text-color">
                 <span class="h-2 w-2 rounded-full" [class]="item.dotClass"></span>
@@ -67,7 +67,7 @@
       <p-chart
         type="line"
         class="relative mt-4 block h-64"
-        [data]="monthlyVolumeData"
+        [data]="monthlyVolumeData()"
         [options]="monthlyVolumeOptions"
       />
     </div>
@@ -79,7 +79,7 @@
         Candidate Scores
       </p>
       <ul class="mt-4 flex flex-col gap-3">
-        @for (candidate of candidateScores; track candidate.rank) {
+        @for (candidate of candidateScores(); track candidate.rank) {
           <li class="flex items-center gap-3 text-sm">
             <span class="w-4 shrink-0 text-muted-color">{{
               candidate.rank
@@ -99,12 +99,16 @@
             <span
               class="w-8 shrink-0 text-right font-medium"
               [class]="scoreTextClass(candidate.score)"
-              >{{ candidate.score }}</span
+              >{{ candidate.score.toFixed(1) }}</span
             >
             <span class="w-6 shrink-0 text-right text-xs text-muted-color"
               >{{ candidate.sessions }}s</span
             >
           </li>
+        } @empty {
+          @if (!loading()) {
+            <li class="text-sm text-muted-color">No rated feedback yet.</li>
+          }
         }
       </ul>
 
@@ -121,11 +125,11 @@
           >
             <span
               class="block h-full rounded-full bg-emerald-600"
-              [style.width.%]="(publishedFeedback / totalFeedback) * 100"
+              [style.width.%]="totalFeedback() ? (publishedFeedback() / totalFeedback()) * 100 : 0"
             ></span>
           </span>
           <span class="shrink-0 text-muted-color"
-            >{{ publishedFeedback }}/{{ totalFeedback }}</span
+            >{{ publishedFeedback() }}/{{ totalFeedback() }}</span
           >
         </div>
       </div>

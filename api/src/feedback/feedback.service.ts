@@ -16,6 +16,7 @@ const SESSION_SUMMARY_SELECT = { id: true, position: true, scheduledAt: true } a
 
 type FeedbackWithRelations = Feedback & {
   author: { id: string; firstName: string; lastName: string; email: string };
+  candidate: { id: string; firstName: string; lastName: string; email: string };
   session: { id: string; position: string; scheduledAt: Date };
 };
 
@@ -24,6 +25,7 @@ function toResponse(feedback: FeedbackWithRelations): FeedbackResponseDto {
     id: feedback.id,
     session: feedback.session,
     author: feedback.author,
+    candidate: feedback.candidate,
     rating: feedback.rating,
     recommendation: feedback.recommendation,
     comments: feedback.comments,
@@ -79,7 +81,11 @@ export class FeedbackService {
         isPublished,
         publishedAt: isPublished ? new Date() : null,
       },
-      include: { author: { select: PERSON_SELECT }, session: { select: SESSION_SUMMARY_SELECT } },
+      include: {
+        author: { select: PERSON_SELECT },
+        candidate: { select: PERSON_SELECT },
+        session: { select: SESSION_SUMMARY_SELECT },
+      },
     });
 
     return toResponse(feedback);
@@ -99,7 +105,11 @@ export class FeedbackService {
     const [items, total] = await this.prisma.$transaction([
       this.prisma.feedback.findMany({
         where,
-        include: { author: { select: PERSON_SELECT }, session: { select: SESSION_SUMMARY_SELECT } },
+        include: {
+          author: { select: PERSON_SELECT },
+          candidate: { select: PERSON_SELECT },
+          session: { select: SESSION_SUMMARY_SELECT },
+        },
         orderBy: { createdAt: 'desc' },
         take: query.take,
         skip: query.skip,
@@ -113,7 +123,11 @@ export class FeedbackService {
   async findOne(id: string, requester: AuthenticatedUser): Promise<FeedbackResponseDto> {
     const feedback = await this.prisma.feedback.findUnique({
       where: { id },
-      include: { author: { select: PERSON_SELECT }, session: { select: SESSION_SUMMARY_SELECT } },
+      include: {
+        author: { select: PERSON_SELECT },
+        candidate: { select: PERSON_SELECT },
+        session: { select: SESSION_SUMMARY_SELECT },
+      },
     });
     const hidden =
       !feedback ||
@@ -168,7 +182,11 @@ export class FeedbackService {
         isPublished: dto.isPublished,
         publishedAt,
       },
-      include: { author: { select: PERSON_SELECT }, session: { select: SESSION_SUMMARY_SELECT } },
+      include: {
+        author: { select: PERSON_SELECT },
+        candidate: { select: PERSON_SELECT },
+        session: { select: SESSION_SUMMARY_SELECT },
+      },
     });
 
     return toResponse(feedback);

@@ -28,6 +28,7 @@ export interface Feedback {
   id: string;
   session: FeedbackSessionSummary;
   author: PersonSummary;
+  candidate: PersonSummary;
   rating: number | null;
   recommendation: Recommendation;
   comments: string;
